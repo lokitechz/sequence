@@ -1,0 +1,98 @@
+@startuml Inbound Funds Flow
+
+autonumber "<b>[00]"
+actor Customer as "Customer"
+box ROC
+participant TCBM as "Techcombank Mobile App" #LightBlue
+participant Edge as "Edge" #LightBlue
+participant OT as "roc-oversea-transfer-dis" #LightBlue
+participant Redis as "Redis" #LightBlue
+database OTDB as "roc-oversea-transfer-db" #LightBlue
+end box
+participant Notihub as "Notihub" #LightBlue
+queue MSK as "MSK Bankwide" #LightBlue
+participant MuleIn as "Mule Internal" #LightBlue
+participant PL as "Paylink" #LightBlue
+participant PLDB as "Paylink DB" #LightBlue
+participant T24 as "T24" #LightBlue
+participant MuleEx as "Mule External" #LightBlue
+participant CC as "Currencycloud" #LightYellow
+
+== Authentication Setup (if token expired) ==
+group Authentication with Currencycloud
+OT -> MuleEx: Login api from Currencycloud\nPOST /v2/authenticate/api(login_id & api_key)
+activate MuleEx
+MuleEx -> CC: Foward
+activate CC
+CC --> MuleEx: Response (auth_token)
+deactivate CC
+MuleEx -> OT: Response (auth_token)
+deactivate MuleEx
+
+alt if status = 200 & auth_token != null
+    OT -> Redis: Store auth_token with expiry
+    activate Redis
+    Redis --> OT: Response
+    deactivate Redis
+else other cases (e.g., status != 200 and auth_token = null)
+    OT -> OT: Handle error (log exception)
+end
+end
+
+== Wait for Inbound Funds ==
+note over MuleEx,CC: Currencycloud sends push notification when funds arrive
+
+activate CC
+CC -> MuleEx: Push Notification (pending inbound funds)
+
+MuleEx -> MSK: Publish inbound funds message
+
+OT --> MSK: Consume inbound funds message
+
+OT -> OT: Check account status (active/inactive)
+
+OT -> PL: Forward inbound funds transaction with status
+activate PL
+
+PL -> PLDB: Store inbound transaction with account status
+activate PLDB
+
+PLDB --> PL: Response
+deactivate PLDB
+
+PL -> PL: Process inbound funds (accept/reject based on account status)
+
+PL -> MuleEx: Send response to Currencycloud\nPUT /collections_screening/{transaction_id}/complete
+activate MuleEx
+
+MuleEx -> CC: Foward response
+activate CC
+
+CC --> MuleEx: Response
+deactivate CC
+
+MuleEx --> PL: Response
+deactivate MuleEx
+
+PL -> PLDB: Update transaction status
+activate PLDB
+
+PLDB --> PL: Response
+deactivate PLDB
+
+PL -> T24: Accounting to T24
+activate T24
+
+T24 --> PL: Response
+deactivate PL
+
+T24 --> MSK: Publish Account Balance Change message
+deactivate T24
+
+Notihub --> MSK: Consume Account Balance Change message
+
+Notihub -> TCBM: Push notification Account Balance Change
+
+TCBM -> Customer: Display notification
+
+@enduml
