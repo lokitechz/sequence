@@ -1,4 +1,4 @@
-@startuml Get List Master Data Flow
+@startuml Get list of currencies
 
 autonumber "<b>[0]"
 actor Client
