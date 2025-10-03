@@ -1,0 +1,37 @@
+@startuml Get List Master Data Flow
+
+autonumber "<b>[0]"
+actor Client
+box ROC
+participant "Techcombank Mobile" as TCB
+participant "Edge" as EDGE
+participant "arrangement-manager-extension" as AME
+database "arrangement-manager-extension" as DB
+end box
+
+Client -> TCB: Create visa cross border account
+TCB -> EDGE: Request get list currency\nGET /client-api/v1/currencies
+EDGE -> AME: Forward
+AME -> AME: Validate customer (typeCus = 200 & biometric = true & CCCD valid)
+alt Validation successful
+    AME -> DB: Query currency list
+    activate AME
+    activate DB
+    DB --> AME: Return currency records
+    deactivate DB
+    AME -> AME: Call API get link account from table <b>visa_account_link</b>
+    alt Link account exist
+        AME -> AME: Set currency status to <b>INACTIVE</b>
+    else Link account not exist
+        AME -> AME: Set currency status to <b>ACTIVE</b>
+    end
+    AME --> EDGE: Return currency response with status
+    EDGE --> TCB: Return list of currencies with status
+    TCB --> Client: Display list of currencies
+else Validation failed
+    AME -> EDGE: Return validation error
+    EDGE -> TCB: Forward error response
+    TCB -> Client: Display error message
+end
+
+@enduml
