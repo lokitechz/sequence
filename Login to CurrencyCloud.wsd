@@ -1,0 +1,57 @@
+@startuml CurrencyCloud Authentication & Token Cache Flow
+
+autonumber "<b>[0]"
+actor Client
+participant "arrangement-manager-extension" as AME
+participant "redis" as REDIS
+participant "Mule External" as ME
+participant "CurrencyCloud" as CC
+
+== Token Request ==
+Client -> AME: Request to authenticate with CurrencyCloud
+AME -> REDIS: GET access_token from Redis
+
+alt Token not found or expired
+    AME -> ME: POST /v2/authenticate/api\n(login_id, api_key)
+    activate ME
+    ME -> CC: Forward
+    activate CC
+    alt API call success 
+        CC --> ME: Return result
+        ME --> AME: Forward
+        deactivate ME
+        AME -> REDIS: SET currency_cloud_access_token = auth_token\nEXPIRE 1800s
+    else API call failed
+        CC --> ME: Return error result
+        deactivate CC
+        ME --> AME: Forward
+        deactivate ME
+        AME --> Client: Display error message
+    end
+else Token found
+    REDIS --> AME: Return currency_cloud_access_token
+    AME --> Client: Return valid access_token
+end
+
+== Token Expiration ==
+note over REDIS: currency_cloud_access_token expired automatically after 30 minutes
+
+Client -> AME: Request new authentication
+AME -> ME: POST /v2/authenticate/api\n(login_id, api_key)
+activate ME
+ME -> CC: Forward
+activate CC
+alt API call success 
+    CC --> ME: Return result
+    ME --> AME: Forward
+    deactivate ME
+    AME -> REDIS: SET currency_cloud_access_token = auth_token\nEXPIRE 1800s
+else API call failed
+    CC --> ME: Return error result
+    deactivate CC
+    ME --> AME: Forward
+    deactivate ME
+    AME --> Client: Display error message
+end
+
+@enduml
