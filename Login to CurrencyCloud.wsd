@@ -1,57 +1,39 @@
-@startuml CurrencyCloud Authentication & Token Cache Flow
+@startuml CurrencyCloud Authentication & Token Cache Flow (Cache handled in Mule External)
 
 autonumber "<b>[0]"
 actor Client
-participant "arrangement-manager-extension" as AME
-participant "redis" as REDIS
 participant "Mule External" as ME
+participant "Mule Object Store" as MOS
 participant "CurrencyCloud" as CC
 
 == Token Request ==
-Client -> AME: Request to authenticate with CurrencyCloud
-AME -> REDIS: GET access_token from Redis
-
+ME -> MOS: GET access_token from Object Store
 alt Token not found or expired
-    AME -> ME: POST /v2/authenticate/api\n(login_id, api_key)
-    activate ME
-    ME -> CC: Forward
+    ME -> CC: POST /v2/authenticate/api\n(login_id, api_key)
     activate CC
-    alt API call success 
-        CC --> ME: Return result
-        ME --> AME: Forward
-        deactivate ME
-        AME -> REDIS: SET currency_cloud_access_token = auth_token\nEXPIRE 1800s
+    alt API call success
+        CC --> ME: 200 OK {auth_token, expires_in=1500}
+        ME -> MOS: SET access_token = auth_token\nEXPIRE 1800s
     else API call failed
         CC --> ME: Return error result
         deactivate CC
-        ME --> AME: Forward
-        deactivate ME
-        AME --> Client: Display error message
     end
 else Token found
-    REDIS --> AME: Return currency_cloud_access_token
-    AME --> Client: Return valid access_token
+    MOS --> ME: Return cached access_token
+    deactivate ME
 end
 
 == Token Expiration ==
-note over REDIS: currency_cloud_access_token expired automatically after 30 minutes
-
-Client -> AME: Request new authentication
-AME -> ME: POST /v2/authenticate/api\n(login_id, api_key)
-activate ME
-ME -> CC: Forward
+note over MOS: access_token expired automatically after 25 minutes
+ME -> CC: POST /v2/authenticate/api\n(login_id, api_key)
 activate CC
 alt API call success 
-    CC --> ME: Return result
-    ME --> AME: Forward
+    CC --> ME: 200 OK {auth_token, expires_in=1500}
+    ME -> MOS: SET access_token = auth_token\nEXPIRE 1500s
     deactivate ME
-    AME -> REDIS: SET currency_cloud_access_token = auth_token\nEXPIRE 1800s
 else API call failed
     CC --> ME: Return error result
     deactivate CC
-    ME --> AME: Forward
-    deactivate ME
-    AME --> Client: Display error message
 end
 
 @enduml
