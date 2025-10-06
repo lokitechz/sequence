@@ -1,98 +1,111 @@
 @startuml Inbound Funds Flow
 
 autonumber "<b>[00]"
-actor Customer as "Customer"
+actor Client
 box ROC
-participant TCBM as "Techcombank Mobile App" #LightBlue
-participant Edge as "Edge" #LightBlue
-participant OT as "roc-oversea-transfer-dis" #LightBlue
-participant Redis as "Redis" #LightBlue
-database OTDB as "roc-oversea-transfer-db" #LightBlue
+participant "Techcombank Mobile" as TCB
+participant "Edge" as EDGE
+participant "roc-oversea-transfer-dis" as OT
+participant "arrangement-manager-extension" as AME
+participant "Redis" as REDIS
+database "ROC DB" as DB
 end box
-participant Notihub as "Notihub" #LightBlue
-queue MSK as "MSK Bankwide" #LightBlue
-participant MuleIn as "Mule Internal" #LightBlue
-participant PL as "Paylink" #LightBlue
-participant PLDB as "Paylink DB" #LightBlue
-participant T24 as "T24" #LightBlue
-participant MuleEx as "Mule External" #LightBlue
-participant CC as "Currencycloud" #LightYellow
+participant "redis" as REDIS
+participant "Notihub" as NOTIHUB
+queue "MSK Bankwide" as MSK
+participant "Mule Internal" as MI
+participant "Paylink" as PL
+participant "Paylink DB" as PLDB
+participant "T24" as T24
+participant "Mule External" as ME
+participant "Currencycloud" as CC
 
-== Authentication Setup (if token expired) ==
-group Authentication with Currencycloud
-OT -> MuleEx: Login api from Currencycloud\nPOST /v2/authenticate/api(login_id & api_key)
-activate MuleEx
-MuleEx -> CC: Foward
-activate CC
-CC --> MuleEx: Response (auth_token)
-deactivate CC
-MuleEx -> OT: Response (auth_token)
-deactivate MuleEx
-
-alt if status = 200 & auth_token != null
-    OT -> Redis: Store auth_token with expiry
-    activate Redis
-    Redis --> OT: Response
-    deactivate Redis
-else other cases (e.g., status != 200 and auth_token = null)
-    OT -> OT: Handle error (log exception)
-end
-end
-
-== Wait for Inbound Funds ==
-note over MuleEx,CC: Currencycloud sends push notification when funds arrive
+note over ME,CC: Currencycloud sends push notification when funds arrive
 
 activate CC
-CC -> MuleEx: Push Notification (pending inbound funds)
-
-MuleEx -> MSK: Publish inbound funds message
-
+CC -> ME: Push Notification (pending inbound funds)
+ME -> MSK: Publish inbound funds message
 OT --> MSK: Consume inbound funds message
-
-OT -> OT: Check account status (active/inactive)
-
-OT -> PL: Forward inbound funds transaction with status
-activate PL
-
-PL -> PLDB: Store inbound transaction with account status
-activate PLDB
-
-PLDB --> PL: Response
-deactivate PLDB
-
-PL -> PL: Process inbound funds (accept/reject based on account status)
-
-PL -> MuleEx: Send response to Currencycloud\nPUT /collections_screening/{transaction_id}/complete
-activate MuleEx
-
-MuleEx -> CC: Foward response
+activate OT
+note right of OT
+Step 1: Call CurrencyCloud to get funding transaction details
+end note
+OT -> ME: GET /v2/funding_transactions/{transaction_id}
+activate ME
+ME -> CC: Forward
 activate CC
-
-CC --> MuleEx: Response
+CC --> ME: Return result
 deactivate CC
+ME --> OT: Forward
+deactivate ME
 
-MuleEx --> PL: Response
-deactivate MuleEx
+note right of OT
+Step 2: Store transaction details into TCB database
+end note
+OT -> DB: INSERT INTO visa_inbound_funds
+activate DB
+DB --> OT: Insert success
+deactivate DB
 
-PL -> PLDB: Update transaction status
-activate PLDB
+OT -> OT: Validate transaction details
+alt Validation successful
+    note right of OT
+    Step 3: Call to arrangement service to get account details and verify account is valid to receive money
+    end note
+    OT -> AME: GET /service-api/v2/visa-accounts/{accountId}
+    activate AME
+    AME -> MI: Call T24 get account details\nPOST /internal/retails/v2/inquiry-account-services
+    activate MI
+    MI -> T24: Forward
+    activate T24
+    T24 --> MI: Return result
+    deactivate T24
+    MI --> AME: Forward
+    deactivate MI
+    AME -> AME: Validate account details
+    alt Account valid to receive money
+        AME --> OT: Return account details
+        deactivate AME
+    end
+    OT -> OT: Process to receive money
 
-PLDB --> PL: Response
-deactivate PLDB
+    note right of OT
+    Step 4: Call CurrencyCloud to accept or reject inbound funds
+    Before proceeding ensure valid CurrencyCloud token.
+    See separate diagram: 
+    end note
+    OT -> ME: POST /v2/collections_screening/{transaction_id}/complete\naccepted=true
+    activate ME
+    ME -> CC: Forward
+    activate CC
+    CC --> ME: Return result
+    deactivate CC
+    ME --> OT: Forward
+    deactivate ME
+    OT -> DB: UPDATE visa_inbound_funds SET status = "ACCEPTED"
+    activate DB
+    DB --> OT: Update success
+    deactivate DB
+    OT -> PL: Call Paylink to accounting
 
-PL -> T24: Accounting to T24
-activate T24
-
-T24 --> PL: Response
-deactivate PL
-
-T24 --> MSK: Publish Account Balance Change message
-deactivate T24
-
-Notihub --> MSK: Consume Account Balance Change message
-
-Notihub -> TCBM: Push notification Account Balance Change
-
-TCBM -> Customer: Display notification
-
+else Validation failed
+    note right of OT
+    Step 3.1: Call CurrencyCloud to accept or reject inbound funds
+    Before proceeding ensure valid CurrencyCloud token.
+    See separate diagram: 
+    end note
+    OT -> ME: POST /v2/collections_screening/{transaction_id}/complete\naccepted=false
+    activate ME
+    ME -> CC: Forward
+    activate CC
+    CC --> ME: Return result
+    deactivate CC
+    ME --> OT: Forward
+    deactivate ME
+    OT -> DB: UPDATE visa_inbound_funds SET status = "REJECTED"
+    activate DB
+    DB --> OT: Update success
+    deactivate DB
+    OT -> OT: End process
+end
 @enduml
