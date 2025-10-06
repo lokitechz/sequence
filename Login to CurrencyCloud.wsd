@@ -13,7 +13,7 @@ alt Token not found or expired
     activate CC
     alt API call success
         CC --> ME: 200 OK {auth_token, expires_in=1500}
-        ME -> MOS: SET access_token = auth_token\nEXPIRE 1800s
+        ME -> MOS: SET access_token = auth_token\nEXPIRE 1500s
     else API call failed
         CC --> ME: Return error result
         deactivate CC
