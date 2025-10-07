@@ -1,0 +1,37 @@
+CREATE TABLE CURRENCYCLOUD_FUNDING_ACCOUNT (
+  -- Khóa chính theo ID của Funding Account
+  ID CHAR(36) PRIMARY KEY COMMENT 'UUID của funding account trong CurrencyCloud',
+
+  -- Liên kết đến account chính (sub-account hoặc master account)
+  ACCOUNT_ID CHAR(36) NOT NULL COMMENT 'UUID của tài khoản CurrencyCloud sở hữu funding account',
+
+  -- Thông tin tài khoản ngân hàng
+  ACCOUNT_NUMBER        VARCHAR(50)  NOT NULL COMMENT 'Số tài khoản hoặc IBAN',
+  ACCOUNT_NUMBER_TYPE   ENUM('iban','account_number') NOT NULL COMMENT 'Loại số tài khoản (iban/account_number)',
+  ACCOUNT_HOLDER_NAME   VARCHAR(150) NOT NULL COMMENT 'Tên chủ tài khoản',
+
+  -- Thông tin ngân hàng
+  BANK_NAME             VARCHAR(150) NOT NULL COMMENT 'Tên ngân hàng',
+  BANK_ADDRESS          VARCHAR(255) NOT NULL COMMENT 'Địa chỉ ngân hàng',
+  BANK_COUNTRY          CHAR(2)      NOT NULL COMMENT 'Mã quốc gia của ngân hàng (ISO 3166-1 alpha-2)',
+
+  -- Thông tin tiền tệ và phương thức thanh toán
+  CURRENCY              CHAR(3)      NOT NULL COMMENT 'Mã tiền tệ (ISO 4217)',
+  PAYMENT_TYPE          ENUM('regular','priority') NOT NULL COMMENT 'Loại thanh toán (regular/priority)',
+
+  -- Thông tin routing (mã ngân hàng, BIC/SWIFT, sort code,...)
+  ROUTING_CODE          VARCHAR(50)  DEFAULT NULL COMMENT 'Routing code (ví dụ BIC/SWIFT hoặc sort code)',
+  ROUTING_CODE_TYPE     VARCHAR(50)  DEFAULT NULL COMMENT 'Loại routing code (bic_swift, sort_code, aba, ...)',
+
+  -- Thông tin thời gian tạo và cập nhật
+  CREATED_AT            DATETIME NOT NULL COMMENT 'Thời điểm tạo record (UTC)',
+  UPDATED_AT            DATETIME NOT NULL COMMENT 'Thời điểm cập nhật record (UTC)',
+
+  -- Thông tin audit nội bộ
+  CREATED_AT_LOCAL      TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Thời điểm insert vào hệ thống nội bộ',
+  UPDATED_AT_LOCAL      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Thời điểm cập nhật nội bộ',
+
+  -- Indexes
+  INDEX IDX_ACCOUNT_ID (ACCOUNT_ID),
+  INDEX IDX_CURRENCY (CURRENCY)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Lưu thông tin funding account của CurrencyCloud';
