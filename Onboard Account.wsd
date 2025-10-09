@@ -46,7 +46,7 @@ activate IDS
 IDS --> CMS: Callback transaction signing
 deactivate IDS
 activate CMS
-CMS --> AME: Call back to arrangement service\nPATCH /service-api/v1/visaxborder/confirmation/{confirmationId}
+CMS --> AME: Call back to arrangement service\nPATCH /service-api/v1/visaxborder/request/{confirmationId}
 deactivate CMS
 
 activate AME
@@ -126,7 +126,16 @@ alt Any error from CurrencyCloud and T24
     deactivate AME
 end
 
-loop 3 times break if status = SUCCESS/FAIL
+loop 3 times Get confirmation status
+TCB -> AME: GET /client-api/v1/visaxborder/request/{confirmationId}
+activate AME
+AME -> DB: Get record from table <b>visa-account-request</b>
+activate DB
+DB --> AME: Return result
+deactivate DB
+AME --> TCB: Return result
+deactivate AME
+TCB --> Client: Display screen with status SUCCESS/FAIL
 end
 
 @enduml
