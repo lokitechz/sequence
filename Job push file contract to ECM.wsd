@@ -1,0 +1,30 @@
+@startuml Cronjob push file contract to ECM
+
+autonumber "<b>[0]"
+box ROC
+participant "arrangement-manager-extension" as AME
+participant "oversea-transfer-dis" as OVS
+database "arrangement-manager-extension" as DB
+end box
+participant "ECM" as ECM
+queue "MSK Bankwide" as MSK
+
+note over AME
+Cronjob run at 12:00 PM daily
+end note
+AME -> DB: Query information
+activate DB
+DB --> AME: Return result
+deactivate DB
+AME -> AME: Fill data to contract template
+AME -> MSK: Push file contract to Kafka bankwide
+OVS -> MSK: Consume message event from Kafka bankwide
+activate OVS
+OVS -> ECM: Push file contract to ECM system
+deactivate OVS
+ECM --> OVS: Return ecmId
+activate OVS
+OVS -> AME: Update ecmId to table
+deactivate OVS
+
+@enduml
