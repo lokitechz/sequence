@@ -118,7 +118,8 @@ T24 --> MI: Return result
 deactivate T24
 MI --> AME: Forward
 deactivate MI
-AME -> DB: UPDATE <b>visa-account-link</b> BY id = :id\nstatus = SUCCESS\nt24AccountNumber = :accountNumber
+AME -> DB: UPDATE <b>visa-account-link</b> BY id = :id\nstatus = SUCCESS
+AME -> DB: UPDATE <b>visa-funding-account</b> BY id = :id\nt24AccountNumber = :accountNumber
 AME -> DB: UPDATE <b>visa-account-request</b> BY confirmationId = :confirmationId\nstatus = SUCCESS
 
 alt Any error from CurrencyCloud and T24
