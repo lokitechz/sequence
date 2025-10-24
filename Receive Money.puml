@@ -5,107 +5,125 @@ actor Client
 box ROC
 participant "Techcombank Mobile" as TCB
 participant "Edge" as EDGE
-participant "roc-oversea-transfer-dis" as OT
 participant "arrangement-manager-extension" as AME
-participant "Redis" as REDIS
-database "ROC DB" as DB
+database "ROC DB" as AMEDB
 end box
-participant "redis" as REDIS
-participant "Notihub" as NOTIHUB
-queue "MSK Bankwide" as MSK
-participant "Mule Internal" as MI
-participant "Paylink" as PL
+box Paylink
+participant "payment-initiation" as PI
+participant "payment-order-fcy" as PO
+queue "Kafka Internal" as PLK
 participant "Paylink DB" as PLDB
+end box
 participant "T24" as T24
+queue "MSK Bankwide" as MSK
+participant "Notihub" as Notihub
 participant "Mule External" as ME
 participant "Currencycloud" as CC
 
 note over ME,CC: Currencycloud sends push notification when funds arrive
 
 activate CC
-CC -> ME: Push Notification (pending inbound funds)
-ME -> MSK: Publish inbound funds message
-OT --> MSK: Consume inbound funds message
-activate OT
-note right of OT
+CC -> ME: Push Notification\nnotification_type: pending_cash_manager_transaction_notification
+ME -> MSK: Push inbound funds message
+PI --> MSK: Consume inbound funds message
+note right of PI
 Step 1: Call CurrencyCloud to get funding transaction details
 end note
-OT -> ME: GET /v2/funding_transactions/{transaction_id}
+activate PI
+PI -> ME: Get Funding Transaction Details
 activate ME
-ME -> CC: Forward
+ME -> CC: GET /v2/funding_transactions/{id}
+CC --> ME: Funding Transaction Details
+deactivate CC
+ME --> PI: Return result
+deactivate ME
+note right of PI
+Step 2: Check additional_information field for specified characters
+end note
+alt additional_information contains specified characters
+    PI -> ME: Reject Transaction
+    activate ME
+    ME -> CC: POST /v2/collections_screening/{transaction_id}/complete\naccepted=false
+    activate CC
+    CC --> ME: Return result
+    deactivate CC
+    ME --> PI: Return result
+    deactivate ME
+else additional_information does not contain specified characters
+    PI -> ME: Accept Transaction
+    activate ME
+    ME -> CC: POST /v2/collections_screening/{transaction_id}/complete\naccepted=true
+    activate CC
+    CC --> ME: Return result
+    deactivate CC
+    ME --> PI: Return result
+    deactivate ME
+end
+PI -> PLDB: Store transaction status
+activate PLDB
+PLDB --> PI: Return result
+deactivate PLDB
+
+== Process if transaction is accepted ==
+CC -> ME: Push Notification\nnotification_type: cash_manager_transaction_notification
+ME -> MSK: Push inbound funds message completed transaction
+note right of PI
+Step 3: Consume inbound funds message completed transaction
+end note
+PI --> MSK: Consume inbound funds message completed transaction
+PI -> AME: Get customer link account details\nGET /v1/visaxborder/account?accountId={accountId}&currency={currency}
+activate AME
+AME -> AMEDB: Query account details
+activate AMEDB
+AMEDB --> AME: Return result
+deactivate AMEDB
+AME --> PI: Return account details
+deactivate AME
+note right of PI
+Step 4: Build kafka event for accounting
+end note
+PI -> PI: Build accounting message
+PI -> PLK: Produce accounting message to Kafka
+activate PLK
+PO --> PLK: Consume accounting message from Kafka
+deactivate PLK
+activate PO
+note right of PO
+Step 5: Accounting to core banking system T24
+end note
+PO -> T24: POST /internal/bpm/v1/common-services/ft/internal/ac01
+activate T24
+T24 --> PO: Return result
+deactivate T24
+PO -> PLDB: Update transaction status to completed
+activate PLDB
+PLDB --> PO: Return result
+deactivate PLDB
+deactivate PO
+T24 -> MSK: Send ABC message to bankwide system
+Notihub --> MSK: Consume ABC message and notify client
+activate Notihub
+Notihub -> TCB: Send notification to Techcombank Mobile for Account Blance Change
+deactivate Notihub
+
+== Process auto move money form sub-account to master-account in Currencycloud ==
+PO -> ME: Check sub-account balance and move money if needed
+activate PO
+activate ME
+ME -> CC: GET /v2/balances/EUR?on_behalf_of={subAccountId}
 activate CC
 CC --> ME: Return result
 deactivate CC
-ME --> OT: Forward
-deactivate ME
-
-note right of OT
-Step 2: Store transaction details into TCB database
-end note
-OT -> DB: INSERT INTO visa_inbound_funds
-activate DB
-DB --> OT: Insert success
-deactivate DB
-
-OT -> OT: Validate transaction details
-alt Validation successful
-    note right of OT
-    Step 3: Call to arrangement service to get account details and verify account is valid to receive money
-    end note
-    OT -> AME: GET /service-api/v2/visa-accounts/{accountId}
-    activate AME
-    AME -> MI: Call T24 get account details\nPOST /internal/retails/v2/inquiry-account-services
-    activate MI
-    MI -> T24: Forward
-    activate T24
-    T24 --> MI: Return result
-    deactivate T24
-    MI --> AME: Forward
-    deactivate MI
-    AME -> AME: Validate account details
-    alt Account valid to receive money
-        AME --> OT: Return account details
-        deactivate AME
-    end
-    OT -> OT: Process to receive money
-
-    note right of OT
-    Step 4: Call CurrencyCloud to accept or reject inbound funds
-    Before proceeding ensure valid CurrencyCloud token.
-    See separate diagram: 
-    end note
-    OT -> ME: POST /v2/collections_screening/{transaction_id}/complete\naccepted=true
-    activate ME
-    ME -> CC: Forward
+ME --> PO: Return result
+alt Balance amount > 0
+    PO -> ME: Make transfer to master account
+    ME -> CC: POST /v2/transfers/create
     activate CC
     CC --> ME: Return result
     deactivate CC
-    ME --> OT: Forward
-    deactivate ME
-    OT -> DB: UPDATE visa_inbound_funds SET status = "ACCEPTED"
-    activate DB
-    DB --> OT: Update success
-    deactivate DB
-    OT -> PL: Call Paylink to accounting
-
-else Validation failed
-    note right of OT
-    Step 3.1: Call CurrencyCloud to accept or reject inbound funds
-    Before proceeding ensure valid CurrencyCloud token.
-    See separate diagram: 
-    end note
-    OT -> ME: POST /v2/collections_screening/{transaction_id}/complete\naccepted=false
-    activate ME
-    ME -> CC: Forward
-    activate CC
-    CC --> ME: Return result
-    deactivate CC
-    ME --> OT: Forward
-    deactivate ME
-    OT -> DB: UPDATE visa_inbound_funds SET status = "REJECTED"
-    activate DB
-    DB --> OT: Update success
-    deactivate DB
-    OT -> OT: End process
+    ME --> PO: Return result
 end
+deactivate ME
+deactivate PO
+
 @enduml
