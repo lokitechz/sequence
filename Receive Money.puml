@@ -26,10 +26,19 @@ activate CC
 CC -> ME: Push Notification\nnotification_type: pending_cash_manager_transaction_notification
 ME -> MSK: Push inbound funds message
 PI --> MSK: Consume inbound funds message
-note right of PI
-Step 1: Call CurrencyCloud to get funding transaction details
-end note
 activate PI
+
+note right of PI
+Step 1: Save transaction details to Paylink DB
+end note
+PI -> PLDB: Store funding transaction details
+activate PLDB
+PLDB --> PI: Return result
+deactivate PLDB
+
+note right of PI
+Step 2: Call CurrencyCloud to get funding transaction details
+end note
 PI -> ME: Get Funding Transaction Details
 activate ME
 ME -> CC: GET /v2/funding_transactions/{id}
@@ -37,8 +46,9 @@ CC --> ME: Funding Transaction Details
 deactivate CC
 ME --> PI: Return result
 deactivate ME
+
 note right of PI
-Step 2: Check additional_information field for specified characters
+Step 3: Check additional_information field for specified characters
 end note
 alt additional_information contains specified characters
     PI -> ME: Reject Transaction
@@ -49,8 +59,15 @@ alt additional_information contains specified characters
     deactivate CC
     ME --> PI: Return result
     deactivate ME
+
+    note over PI
+    Transaction rejected → End flow
+    end note
+    deactivate PI
+
 else additional_information does not contain specified characters
     PI -> ME: Accept Transaction
+    activate PI
     activate ME
     ME -> CC: POST /v2/collections_screening/{transaction_id}/complete\naccepted=true
     activate CC
@@ -58,72 +75,91 @@ else additional_information does not contain specified characters
     deactivate CC
     ME --> PI: Return result
     deactivate ME
-end
-PI -> PLDB: Store transaction status
-activate PLDB
-PLDB --> PI: Return result
-deactivate PLDB
 
-== Process if transaction is accepted ==
-CC -> ME: Push Notification\nnotification_type: cash_manager_transaction_notification
-ME -> MSK: Push inbound funds message completed transaction
-note right of PI
-Step 3: Consume inbound funds message completed transaction
-end note
-PI --> MSK: Consume inbound funds message completed transaction
-PI -> AME: Get customer link account details\nGET /v1/visaxborder/account?accountId={accountId}&currency={currency}
-activate AME
-AME -> AMEDB: Query account details
-activate AMEDB
-AMEDB --> AME: Return result
-deactivate AMEDB
-AME --> PI: Return account details
-deactivate AME
-note right of PI
-Step 4: Build kafka event for accounting
-end note
-PI -> PI: Build accounting message
-PI -> PLK: Produce accounting message to Kafka
-activate PLK
-PO --> PLK: Consume accounting message from Kafka
-deactivate PLK
-activate PO
-note right of PO
-Step 5: Accounting to core banking system T24
-end note
-PO -> T24: POST /internal/bpm/v1/common-services/ft/internal/ac01
-activate T24
-T24 --> PO: Return result
-deactivate T24
-PO -> PLDB: Update transaction status to completed
-activate PLDB
-PLDB --> PO: Return result
-deactivate PLDB
-deactivate PO
-T24 -> MSK: Send ABC message to bankwide system
-Notihub --> MSK: Consume ABC message and notify client
-activate Notihub
-Notihub -> TCB: Send notification to Techcombank Mobile for Account Blance Change
-deactivate Notihub
+    note right of PI
+    Step 4: Update transaction status in Paylink DB
+    end note
+    PI -> PLDB: Update transaction status by transaction ID
+    activate PLDB
+    PLDB --> PI: Return result
+    deactivate PLDB
 
-== Process auto move money form sub-account to master-account in Currencycloud ==
-PO -> ME: Check sub-account balance and move money if needed
-activate PO
-activate ME
-ME -> CC: GET /v2/balances/EUR?on_behalf_of={subAccountId}
-activate CC
-CC --> ME: Return result
-deactivate CC
-ME --> PO: Return result
-alt Balance amount > 0
-    PO -> ME: Make transfer to master account
-    ME -> CC: POST /v2/transfers/create
-    activate CC
-    CC --> ME: Return result
-    deactivate CC
-    ME --> PO: Return result
+    == Process if transaction is accepted ==
+    CC -> ME: Push Notification\nnotification_type: cash_manager_transaction_notification
+    ME -> MSK: Push inbound funds message completed transaction
+    activate MSK
+
+    note right of PI
+    Step 5: Consume inbound funds message completed transaction
+    end note
+    PI --> MSK: Consume inbound funds message completed transaction
+    deactivate MSK
+
+    PI -> AME: Get customer link account details\nGET /v1/visaxborder/account?accountId={accountId}&amp;currency={currency}
+    activate AME
+    AME -> AMEDB: Query account details
+    activate AMEDB
+    AMEDB --> AME: Return result
+    deactivate AMEDB
+    AME --> PI: Return account details
+    deactivate AME
+
+    note right of PI
+    Step 6: Prepare parallel processing
+    end note
+
+    par "Accounting to T24"
+        PI -> PI: Build accounting message
+        PI -> PLK: Produce accounting message to Kafka
+        deactivate PI
+        activate PLK
+        PO --> PLK: Consume accounting message from Kafka
+        deactivate PLK
+        activate PO
+
+        note right of PO
+        Step 7: Accounting to core banking system (T24)
+        end note
+        PO -> T24: POST /internal/bpm/v1/common-services/ft/internal/ac01
+        activate T24
+        T24 --> PO: Return result
+        deactivate T24
+        PO -> PLDB: Update transaction status to completed
+        activate PLDB
+        PLDB --> PO: Return result
+        deactivate PLDB
+        deactivate PO
+
+        T24 -> MSK: Send ABC message to bankwide system
+        Notihub --> MSK: Consume ABC message and notify client
+        activate Notihub
+        Notihub -> TCB: Send notification to Techcombank Mobile for Account Balance Change
+        deactivate Notihub
+
+    else "Auto move money from sub-account to master-account"
+        note right of PO
+        Step 8: Auto move money from sub-account to master account
+        end note
+        PO -> ME: Check sub-account balance and move money if needed
+        activate PO
+        activate ME
+        ME -> CC: GET /v2/balances/EUR?on_behalf_of={subAccountId}
+        activate CC
+        CC --> ME: Return result
+        deactivate CC
+        ME --> PO: Return result
+
+        alt Balance amount > 0
+            PO -> ME: Make transfer to master account
+            ME -> CC: POST /v2/transfers/create
+            activate CC
+            CC --> ME: Return result
+            deactivate CC
+            ME --> PO: Return result
+        end
+        deactivate ME
+        deactivate PO
+    end
 end
-deactivate ME
-deactivate PO
 
 @enduml
