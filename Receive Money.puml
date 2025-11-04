@@ -8,6 +8,7 @@ participant "Edge" as EDGE
 participant "arrangement-manager-extension" as AME
 database "ROC DB" as AMEDB
 end box
+participant "Mule Internal" as MI
 box Paylink
 participant "payment-initiation" as PI
 participant "payment-order-fcy" as PO
@@ -16,7 +17,6 @@ participant "Paylink DB" as PLDB
 end box
 participant "T24" as T24
 queue "MSK Bankwide" as MSK
-participant "Notihub" as Notihub
 participant "Mule External" as ME
 participant "Currencycloud" as CC
 
@@ -103,14 +103,18 @@ else additional_information does not contain specified characters
     PI --> MSK: Consume inbound funds message completed transaction
     deactivate MSK
 
-    PI -> AME: Get customer link account details\nGET /v1/visaxborder/account?accountId={accountId}&amp;currency={currency}
+    PI -> MI: Get customer information
+    activate MI
+    MI -> AME: Get customer link account details\nGET /integration-api/v1/visaxborder/account-info
     activate AME
     AME -> AMEDB: Query account details
     activate AMEDB
     AMEDB --> AME: Return result
     deactivate AMEDB
-    AME --> PI: Return account details
+    AME --> MI: Return account details
     deactivate AME
+    MI --> PI: Forward account details
+    deactivate MI
 
     note right of PI
     Step 7: Prepare parallel processing
@@ -137,12 +141,6 @@ else additional_information does not contain specified characters
         PLDB --> PO: Return result
         deactivate PLDB
         deactivate PO
-
-        T24 -> MSK: Send ABC message to bankwide system
-        Notihub --> MSK: Consume ABC message and notify client
-        activate Notihub
-        Notihub -> TCB: Send notification to Techcombank Mobile for Account Balance Change
-        deactivate Notihub
 
     else "Auto move money from sub-account to master-account"
         note right of PO
