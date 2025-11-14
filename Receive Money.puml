@@ -39,7 +39,7 @@ deactivate PLDB
 note right of PI
 Step 2: Call CurrencyCloud to get funding transaction details
 end note
-PI -> ME: Get Funding Transaction Details
+PI -> ME: Get funding transaction details
 activate ME
 ME -> CC: GET /v2/funding_transactions/{id}
 CC --> ME: Funding Transaction Details
@@ -63,92 +63,87 @@ deactivate AME
 MI --> PI: Forward account details
 deactivate MI
 
-note right of PI
+PI -> PLK: Produce transaction info to Kafka
+deactivate PI
+activate PLK
+PO --> PLK: Consume transaction info from Kafka
+deactivate PLK
+activate PO
+
+note right of PO
 Step 4: Save transaction details to Paylink DB table visaxborder_transaction
 end note
-PI -> PO: POST /v1/visaxborder/transactions
-activate PO
 PO -> PLDB: Insert transaction details with status = <b>INIT</b>
 activate PLDB
 PLDB --> PO: Return result
 deactivate PLDB
-PO --> PI: Return result
-deactivate PO
 
-note right of PI
+note right of PO
 Step 5: Call T24 get list active accounts of customer
 end note
-PI -> T24: GET /internal/retails/v2/inquiry-account-services/get-list-account-by-customer-id?customerId={customerId}
+PO -> T24: GET /internal/retails/v2/inquiry-account-services/get-list-account-by-customer-id?customerId={customerId}
 activate T24
-T24 --> PI: Return list of active accounts
+T24 --> PO: Return list of active accounts
 deactivate T24
 
-note right of PI
+note right of PO
 Step 6: Check additional_information field for specified characters and check existence of active T24 account
 end note
 alt additional_information contains specified characters || T24 account inactive
-    PI -> ME: Reject Transaction
+    PO -> ME: Reject Transaction
     activate ME
     ME -> CC: POST /v2/collections_screening/{transaction_id}/complete\naccepted=false
     activate CC
     CC --> ME: Return result
     deactivate CC
-    ME --> PI: Return result
+    ME --> PO: Return result
     deactivate ME
 
-    note right of PI
+    note right of PO
     Step 7[Case reject]: Update transaction status in Paylink DB
     end note
-    PI -> PO: PUT /v1/visaxborder/transactions/{transaction_id}
-    activate PO
     PO -> PLDB: Update transaction status = <b>REJECTED</b> by transaction_id
     activate PLDB
     PLDB --> PO: Return result
     deactivate PLDB
-    PO --> PI: Return result
-    deactivate PO
 
-    note over PI
+    note over PO
     Transaction rejected → End flow
     end note
-    deactivate PI
-
+    deactivate PO
 else additional_information does not contain specified characters
-    PI -> ME: Accept Transaction
-    activate PI
+    PO -> ME: Accept Transaction
+    activate PO
     activate ME
     ME -> CC: POST /v2/collections_screening/{transaction_id}/complete\naccepted=true
     activate CC
     CC --> ME: Return result
     deactivate CC
-    ME --> PI: Return result
+    ME --> PO: Return result
     deactivate ME
 
-    note right of PI
+    note right of PO
     Step 7[Case accept]: Update transaction status in Paylink DB
     end note
-    PI -> PO: PUT /v1/visaxborder/transactions/{transaction_id}
-    activate PO
     PO -> PLDB: Update transaction status = <b>ACCEPTED</b> by transaction_id
     activate PLDB
     PLDB --> PO: Return result
     deactivate PLDB
-    PO --> PI: Return result
     deactivate PO
-
     == Process if transaction is accepted ==
     CC -> ME: Push Notification\nnotification_type: cash_manager_transaction_notification
     ME -> MSK: Push inbound funds message completed transaction
     activate MSK
 
     note right of PI
-    Step 6: Consume inbound funds message completed transaction
+    Step 8: Consume inbound funds message completed transaction
     end note
     PI --> MSK: Consume inbound funds message completed transaction
     deactivate MSK
+    activate PI
 
     note right of PI
-    Step 7: Prepare parallel processing
+    Prepare parallel processing
     end note
 
     par "Accounting to T24"
@@ -161,7 +156,7 @@ else additional_information does not contain specified characters
         activate PO
 
         note right of PO
-        Step 7.1: Accounting to core banking system (T24)
+        Step 9.1: Accounting to core banking system (T24)
         end note
         PO -> T24: POST /internal/bpm/v1/common-services/ft/internal/ac01
         activate T24
@@ -175,7 +170,7 @@ else additional_information does not contain specified characters
 
     else "Auto move money from sub-account to master-account"
         note right of PO
-        Step 7.2: Auto move money from sub-account to master account
+        Step 9.2: Auto move money from sub-account to master account
         end note
         PO -> ME: Check sub-account balance and move money if needed
         activate PO
