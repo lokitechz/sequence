@@ -29,9 +29,9 @@ PI --> MSK: Consume inbound funds message
 activate PI
 
 note right of PI
-Step 1: Save transaction details to Paylink DB
+Step 1: Save raw transaction info to Paylink DB table message_in
 end note
-PI -> PLDB: Store funding transaction details
+PI -> PLDB: Store raw transaction info
 activate PLDB
 PLDB --> PI: Return result
 deactivate PLDB
@@ -47,16 +47,44 @@ deactivate CC
 ME --> PI: Return result
 deactivate ME
 
-note right of PI
-Step 3: Call T24 get list active accounts of customer
+note left of PI
+Step 3: Call ROC to get customer information
 end note
-PI -> T24: GET /v1/accounts/active?customerId={customerId}
+PI -> MI: Get customer information
+activate MI
+MI -> AME: Get customer link account details\nGET /integration-api/v1/visaxborder/account-info
+activate AME
+AME -> AMEDB: Query account details
+activate AMEDB
+AMEDB --> AME: Return result
+deactivate AMEDB
+AME --> MI: Return account details
+deactivate AME
+MI --> PI: Forward account details
+deactivate MI
+
+note right of PI
+Step 4: Save transaction details to Paylink DB table visaxborder_transaction
+end note
+PI -> PO: POST /v1/visaxborder/transactions
+activate PO
+PO -> PLDB: Insert transaction details with status = <b>INIT</b>
+activate PLDB
+PLDB --> PO: Return result
+deactivate PLDB
+PO --> PI: Return result
+deactivate PO
+
+note right of PI
+Step 5: Call T24 get list active accounts of customer
+end note
+PI -> T24: GET /internal/retails/v2/inquiry-account-services/get-list-account-by-customer-id?customerId={customerId}
 activate T24
 T24 --> PI: Return list of active accounts
 deactivate T24
 
 note right of PI
-Step 4: Check additional_information field for specified characters and check existence of active T24 account
+Step 6: Check additional_information field for specified characters and check existence of active T24 account
 end note
 alt additional_information contains specified characters || T24 account inactive
     PI -> ME: Reject Transaction
@@ -67,6 +95,18 @@ alt additional_information contains specified characters || T24 account inactive
     deactivate CC
     ME --> PI: Return result
     deactivate ME
+
+    note right of PI
+    Step 7[Case reject]: Update transaction status in Paylink DB
+    end note
+    PI -> PO: PUT /v1/visaxborder/transactions/{transaction_id}
+    activate PO
+    PO -> PLDB: Update transaction status = <b>REJECTED</b> by transaction_id
+    activate PLDB
+    PLDB --> PO: Return result
+    deactivate PLDB
+    PO --> PI: Return result
+    deactivate PO
 
     note over PI
     Transaction rejected → End flow
@@ -85,12 +125,16 @@ else additional_information does not contain specified characters
     deactivate ME
 
     note right of PI
-    Step 5: Update transaction status in Paylink DB
+    Step 7[Case accept]: Update transaction status in Paylink DB
     end note
-    PI -> PLDB: Update transaction status by transaction ID
+    PI -> PO: PUT /v1/visaxborder/transactions/{transaction_id}
+    activate PO
+    PO -> PLDB: Update transaction status = <b>ACCEPTED</b> by transaction_id
     activate PLDB
-    PLDB --> PI: Return result
+    PLDB --> PO: Return result
     deactivate PLDB
+    PO --> PI: Return result
+    deactivate PO
 
     == Process if transaction is accepted ==
     CC -> ME: Push Notification\nnotification_type: cash_manager_transaction_notification
@@ -102,19 +146,6 @@ else additional_information does not contain specified characters
     end note
     PI --> MSK: Consume inbound funds message completed transaction
     deactivate MSK
-
-    PI -> MI: Get customer information
-    activate MI
-    MI -> AME: Get customer link account details\nGET /integration-api/v1/visaxborder/account-info
-    activate AME
-    AME -> AMEDB: Query account details
-    activate AMEDB
-    AMEDB --> AME: Return result
-    deactivate AMEDB
-    AME --> MI: Return account details
-    deactivate AME
-    MI --> PI: Forward account details
-    deactivate MI
 
     note right of PI
     Step 7: Prepare parallel processing
@@ -136,7 +167,7 @@ else additional_information does not contain specified characters
         activate T24
         T24 --> PO: Return result
         deactivate T24
-        PO -> PLDB: Update transaction status to completed
+        PO -> PLDB: Update transaction status = <b>ACCOUNTED</b> by transaction_id
         activate PLDB
         PLDB --> PO: Return result
         deactivate PLDB
