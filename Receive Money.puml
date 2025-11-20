@@ -4,7 +4,6 @@ autonumber "<b>[00]"
 actor Client
 box ROC
 participant "Techcombank Mobile" as TCB
-participant "Edge" as EDGE
 participant "arrangement-manager-extension" as AME
 database "ROC DB" as AMEDB
 end box
@@ -17,6 +16,7 @@ participant "Paylink DB" as PLDB
 end box
 participant "T24" as T24
 queue "MSK Bankwide" as MSK
+participant "Notification Hub" as NH
 participant "Mule External" as ME
 participant "Currencycloud" as CC
 
@@ -29,7 +29,7 @@ PI --> MSK: Consume inbound funds message
 activate PI
 
 note right of PI
-Step 1: Save raw transaction info to Paylink DB table message_in
+    Step 1: Save raw transaction info to Paylink DB table message_in
 end note
 PI -> PLDB: Store raw transaction info
 activate PLDB
@@ -37,7 +37,7 @@ PLDB --> PI: Return result
 deactivate PLDB
 
 note right of PI
-Step 2: Call CurrencyCloud to get funding transaction details
+    Step 2: Call CurrencyCloud to get funding transaction details
 end note
 PI -> ME: Get funding transaction details
 activate ME
@@ -48,7 +48,7 @@ ME --> PI: Return result
 deactivate ME
 
 note left of PI
-Step 3: Call ROC to get customer information
+    Step 3: Call ROC to get customer information
 end note
 PI -> MI: Get customer information
 activate MI
@@ -63,7 +63,7 @@ deactivate AME
 MI --> PI: Forward account details
 deactivate MI
 
-PI -> PLK: Produce transaction info to Kafka
+PI -> PLK: Produce transaction info to Paylink Kafka Internal
 deactivate PI
 activate PLK
 PO --> PLK: Consume transaction info from Kafka
@@ -71,7 +71,7 @@ deactivate PLK
 activate PO
 
 note right of PO
-Step 4: Save transaction details to Paylink DB table visaxborder_transaction
+    Step 4: Save transaction details to Paylink DB table visaxborder_transaction
 end note
 PO -> PLDB: Insert transaction details with status = <b>INIT</b>
 activate PLDB
@@ -79,7 +79,7 @@ PLDB --> PO: Return result
 deactivate PLDB
 
 note right of PO
-Step 5: Call T24 get list active accounts of customer
+    Step 5: Call T24 get list active accounts of customer
 end note
 PO -> T24: GET /internal/retails/v2/inquiry-account-services/get-list-account-by-customer-id?customerId={customerId}
 activate T24
@@ -87,7 +87,7 @@ T24 --> PO: Return list of active accounts
 deactivate T24
 
 note right of PO
-Step 6: Check additional_information field for specified characters and check existence of active T24 account
+    Step 6: Check additional_information field for specified characters and check existence of active T24 account
 end note
 alt additional_information contains specified characters || T24 account inactive
     PO -> ME: Reject Transaction
@@ -99,8 +99,23 @@ alt additional_information contains specified characters || T24 account inactive
     ME --> PO: Return result
     deactivate ME
 
+    alt CurrencyCloud return error or timeout
+        note right of PO
+            Step 7: Update transaction status in Paylink DB to retry
+        end note
+        PO -> PLDB: Update transaction status = <b>REJECT_PENDING_RETRY</b>
+        activate PLDB
+        PLDB --> PO: Return result
+        deactivate PLDB
+        PO -> PLK: Produce retry message
+        note over PO
+            Retry flow: <b>Retry reject transaction</b>
+            Transaction rejected → End flow
+        end note
+    end
+
     note right of PO
-    Step 7[Case reject]: Update transaction status in Paylink DB
+        Step 7: Update transaction status in Paylink DB
     end note
     PO -> PLDB: Update transaction status = <b>REJECTED</b> by transaction_id
     activate PLDB
@@ -108,7 +123,7 @@ alt additional_information contains specified characters || T24 account inactive
     deactivate PLDB
 
     note over PO
-    Transaction rejected → End flow
+        Transaction rejected → End flow
     end note
     deactivate PO
 else additional_information does not contain specified characters
@@ -123,7 +138,7 @@ else additional_information does not contain specified characters
     deactivate ME
 
     note right of PO
-    Step 7[Case accept]: Update transaction status in Paylink DB
+        Step 7[Case accept]: Update transaction status in Paylink DB
     end note
     PO -> PLDB: Update transaction status = <b>ACCEPTED</b> by transaction_id
     activate PLDB
@@ -136,62 +151,85 @@ else additional_information does not contain specified characters
     activate MSK
 
     note right of PI
-    Step 8: Consume inbound funds message completed transaction
+        Step 8: Consume inbound funds message completed transaction
     end note
     PI --> MSK: Consume inbound funds message completed transaction
     deactivate MSK
     activate PI
 
     note right of PI
-    Prepare parallel processing
+        Prepare parallel processing
     end note
 
-    par "Accounting to T24"
-        PI -> PI: Build accounting message
-        PI -> PLK: Produce accounting message to Kafka
-        deactivate PI
-        activate PLK
-        PO --> PLK: Consume accounting message from Kafka
-        deactivate PLK
-        activate PO
+    PI -> PI: Build accounting message
+    PI -> PLK: Produce accounting message
+    deactivate PI
+    activate PLK
+    PO --> PLK: Consume accounting message
+    deactivate PLK
+    activate PO
 
-        note right of PO
+    note right of PO
         Step 9.1: Accounting to core banking system (T24)
-        end note
-        PO -> T24: POST /internal/bpm/v1/common-services/ft/internal/ac01
-        activate T24
-        T24 --> PO: Return result
-        deactivate T24
-        PO -> PLDB: Update transaction status = <b>ACCOUNTED</b> by transaction_id
+    end note
+    PO -> T24: POST /internal/bpm/v1/common-services/ft/internal/ac01
+    activate T24
+    T24 --> PO: Return result
+
+    alt T24 return error or timeout
+        PO -> PLDB: Update transaction status = <b>ACCOUNTING_FAIL</b>
         activate PLDB
         PLDB --> PO: Return result
         deactivate PLDB
-        deactivate PO
+    end
 
-    else "Auto move money from sub-account to master-account"
-        note right of PO
+    T24 -> MSK: Account Balance Change
+    deactivate T24
+    activate MSK
+    NH --> MSK: Notification of Account Balance Change
+    deactivate MSK
+    activate NH
+    NH --> Client: Push Notification of Account Balance Change
+    deactivate NH
+    PO -> PLDB: Update transaction status = <b>ACCOUNTED</b> by transaction_id
+    activate PLDB
+    PLDB --> PO: Return result
+    deactivate PLDB
+
+    note right of PO
         Step 9.2: Auto move money from sub-account to master account
-        end note
-        PO -> ME: Check sub-account balance and move money if needed
-        activate PO
-        activate ME
-        ME -> CC: GET /v2/balances/EUR?on_behalf_of={subAccountId}
+    end note
+    PO -> ME: Check sub-account balance
+    activate PO
+    activate ME
+    ME -> CC: GET /v2/balances/EUR?on_behalf_of={subAccountId}
+    activate CC
+    CC --> ME: Return result
+    deactivate CC
+    ME --> PO: Return result
+
+    alt CurrencyCloud return error or timeout
+        PO -> PLDB: Update transaction auto sweep fund status = <b>FAIL</b>
+        activate PLDB
+        PLDB --> PO: Return result
+        deactivate PLDB
+    end
+
+    PO -> PO: Check balance amount
+    alt balance amount > 0
+        PO -> ME: Make transfer to master account
+        ME -> CC: POST /v2/transfers/create
         activate CC
         CC --> ME: Return result
         deactivate CC
         ME --> PO: Return result
-
-        alt Balance amount > 0
-            PO -> ME: Make transfer to master account
-            ME -> CC: POST /v2/transfers/create
-            activate CC
-            CC --> ME: Return result
-            deactivate CC
-            ME --> PO: Return result
-        end
-        deactivate ME
-        deactivate PO
+        PO -> PLDB: Update transaction auto sweep fund status = <b>SUCCESS</b>
+        activate PLDB
+        PLDB --> PO: Return result
+        deactivate PLDB
     end
+    deactivate ME
+    deactivate PO
 end
 
 @enduml
