@@ -1,0 +1,75 @@
+@startuml Get List Master Data Flow
+
+autonumber "<b>[0]"
+actor Client
+box ROC
+participant "Techcombank Mobile" as TCB
+participant "Edge" as EDGE
+participant "arrangement-manager-extension" as AME
+database "arrangement-manager-extension" as DB
+end box
+participant "Mule Internal" as MI
+participant "T24" as T24
+
+Client -> TCB: Create visa cross border account
+TCB -> EDGE: Request get list currency\nGET /client-api/v1/currencies
+EDGE -> EDGE: Check JWT token
+alt Auth failed
+    EDGE --> TCB: Return 401 Unauthorized
+    TCB --> Client: Show error message
+end
+EDGE -> AME: Forward
+activate AME
+AME -> AME: Validate customer (typeCus = 200 & biometric = true & CCCD valid)
+alt Validation successful
+    AME -> DB: Query data from table <b>visa_currency_config</b>
+    activate DB
+    DB --> AME: Return result
+    AME -> DB: Query data from table <b>visa_account_link</b>
+    DB --> AME: Return result
+    deactivate DB
+    AME -> MI: Call T24 get list account active\n<b>POST /internal/retails/v2/inquiry-account-services</b>
+    activate MI
+    MI -> T24: Forward
+    activate T24
+    T24 --> MI: Return result
+    deactivate T24
+    MI --> AME: Forward T24 result
+    deactivate MI
+    AME -> AME: Process T24 result
+
+    alt T24 account not exists
+        AME -> AME: Check <b>visa_account_link</b> result
+        alt No record in <b>visa_account_link</b>
+            note right of AME
+            Case 1: T24 account not exists and records not found in table <b>visa_account_link</b>
+            end note
+            AME -> AME: Set currency status = "ACTIVE"
+        else Record exists in table <b>visa_account_link</b>
+            note right of AME
+            Case 2: T24 account not exists but records found in table <b>visa_account_link</b>
+            end note
+            AME -> DB: Update records in table <b>visa_account_link</b> with status = "UNLINK"
+            activate DB
+            DB --> AME: Return result
+            deactivate DB
+            AME -> AME: Set currency status = "ACTIVE"
+        end
+    else T24 account exists
+        note right of AME
+        Apply for all other case
+        end note
+        AME -> AME: Set currency status = "INACTIVE"
+    end
+
+    AME -> EDGE: Return currency list with status
+    EDGE -> TCB: Forward response
+    TCB -> Client: Display currency list
+else Validation failed
+    AME -> EDGE: Return validation error
+    deactivate AME
+    EDGE -> TCB: Forward response
+    TCB -> Client: Display error message
+end
+
+@enduml

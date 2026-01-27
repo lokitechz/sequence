@@ -1,0 +1,38 @@
+@startuml Inbound Funds Flow
+
+legend top center
+| Color       | Description |
+|<#Orange>    | Update flow  |
+|<#LightGreen>| New flow     |
+endlegend
+
+autonumber "<b>[00]"
+box Paylink
+participant "payment-order-fcy" as PO
+queue "Kafka Internal" as PLK
+participant "Paylink DB" as PLDB
+end box
+participant "Mule External" as ME
+participant "Currencycloud" as CC
+
+alt #LightGreen
+    note over PO,CC: Retry 3 times for failed transaction interval 5 minutes
+    PO --> PLK: Consume retry transaction message
+    activate PO
+    PO -> ME: Reject Transaction
+    activate ME
+    ME -> CC: POST /v2/collections_screening/{transaction_id}/complete\naccepted=false
+    activate CC
+    CC --> ME: Return result
+    deactivate CC
+    ME --> PO: Return result
+    deactivate ME
+    alt CurrencyCloud return error or timeout
+        PO -> PLK: Produce retry message with retry count incremented
+    end
+    PO -> PLDB: Update transaction status = <b>REJECTED</b> by transaction_id
+    activate PLDB
+    PLDB --> PO: Return result
+end
+
+@enduml

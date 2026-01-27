@@ -1,0 +1,142 @@
+@startuml Onboard Account Flow first time
+
+autonumber "<b>[0]"
+actor Client
+box ROC
+participant "Techcombank Mobile" as TCB
+participant "Edge" as EDGE
+participant "arrangement-manager-extension" as AME
+participant "user-manager-dis" as UMD
+participant "confirmation-service" as CMS
+participant "identity-service" as IDS
+database "arrangement-manager-extension" as DB
+end box
+participant "Mule Internal" as MI
+participant "T24" as T24
+participant "Mule External" as ME
+participant "CurrencyCloud" as CC
+
+Client -> TCB: Create visa cross border account
+TCB -> EDGE: Request get list currency\nGET /client-api/v1/visaxborder/create-account
+EDGE -> EDGE: Check JWT token
+alt Auth failed
+    EDGE --> TCB: Return 401 Unauthorized
+    TCB --> Client: Display error message
+end
+EDGE -> AME: Forward
+activate AME
+AME -> UMD: GET /service-api/v2/customer/user-info
+activate UMD
+UMD --> AME: Return result
+deactivate UMD
+AME -> AME: Validate customer info
+AME -> CMS: Create unfinalize confimation
+activate CMS
+CMS --> AME: Return confirmationId
+deactivate CMS
+AME -> DB: Insert to <b>visa-account-request</b>\nconfirmationId = :confirmationId \nstatus = PENDING_CONFIRM
+activate DB
+DB --> AME: Return result
+deactivate DB
+AME -> EDGE: Return unauthorized, request transaction signing
+deactivate AME
+EDGE --> TCB: Forward
+TCB -> IDS: Transaction signing
+activate IDS
+IDS --> CMS: Callback transaction signing
+deactivate IDS
+activate CMS
+CMS --> AME: Call back to arrangement service\nPATCH /service-api/v1/visaxborder/request/{confirmationId}
+deactivate CMS
+
+activate AME
+note right of AME
+Step 1: Get record from table <b>visa-account-request</b>
+end note
+AME -> DB: Get record from table <b>visa-account-request</b>
+
+alt status != PENDING_CONFIRM
+    AME -> AME: Stop process
+end
+
+alt confirmStatus != CONFIRMED
+    AME -> DB: Update record <b>visa-account-request</b>\nstatus = FAILED
+end
+
+AME -> DB: Insert to <b>visa-account-link</b>\nstatus = INIT
+
+note right of AME
+Step 2: Call CurrencyCloud to create sub-account
+end note
+AME -> ME: Create sub-account in CurrencyCloud
+activate ME
+ME -> CC: POST /v2/accounts/create
+activate CC
+CC --> ME: Return result
+deactivate CC
+ME --> AME: Forward
+deactivate ME
+AME -> DB: UPDATE <b>visa-account-link</b> BY id = :id\nstatus = CREATE_SUB_ACCOUNT_SUCCESS\naccountId = :accountId
+
+note right of AME
+Step 3: Call CurrencyCloud to create contact
+end note
+AME -> ME: Create contact in CurrencyCloud
+activate ME
+ME -> CC: POST /v2/contacts/create
+activate CC
+CC --> ME: Return result
+deactivate CC
+ME --> AME: Forward
+deactivate ME
+AME -> DB: UPDATE <b>visa-account-link</b> BY id = :id\nstatus = CREATE_CONTACT_SUCCESS\n
+
+note right of AME
+Step 4: Find funding account infomation in CurrencyCloud
+end note
+AME -> ME: Find funding account in CurrencyCloud
+activate ME
+ME -> CC: POST /v2/funding_accounts/find?account_id=:accountId&currency=:currency
+activate CC
+CC --> ME: Return result
+deactivate CC
+ME --> AME: Forward
+deactivate ME
+loop for each funding account in result
+    AME -> DB: INSERT to <b>visa-funding-account</b>\naccountId = :accountId\ncurrency = :currency\n
+end
+AME -> DB: UPDATE <b>visa-account-link</b> BY id = :id\nstatus = CREATE_FUNDING_ACCOUNT_SUCCESS
+
+note right of AME
+Step 5: Create T24 account for currency request
+end note
+AME -> MI: Call T24 to create account
+activate MI
+MI -> T24: POST /internal/retails/v2/handle-account-services/create-account
+activate T24
+T24 --> MI: Return result
+deactivate T24
+MI --> AME: Forward
+deactivate MI
+AME -> DB: UPDATE <b>visa-account-link</b> BY id = :id\nstatus = SUCCESS
+AME -> DB: UPDATE <b>visa-funding-account</b> BY id = :id\nt24AccountNumber = :accountNumber
+AME -> DB: UPDATE <b>visa-account-request</b> BY confirmationId = :confirmationId\nstatus = SUCCESS
+
+alt Any error from CurrencyCloud and T24
+    AME -> DB: UPDATE <b>visa-account-request</b> BY confirmationId = :confirmationId\nstatus = FAIL\nerrorCode = :errorCode\nerrorMessage = :errorMessage
+    deactivate AME
+end
+
+loop 3 times Get confirmation status
+TCB -> AME: GET /client-api/v1/visaxborder/request/{confirmationId}
+activate AME
+AME -> DB: Get record from table <b>visa-account-request</b>
+activate DB
+DB --> AME: Return result
+deactivate DB
+AME --> TCB: Return result
+deactivate AME
+TCB --> Client: Display screen with status SUCCESS/FAIL
+end
+
+@enduml

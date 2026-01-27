@@ -1,0 +1,58 @@
+@startuml TD and Overdraft by TD
+
+autonumber "<b>[0]"
+actor Client
+participant IDO as "IDO/TCB Mobile"
+participant ROC as "secured-lending-service"
+participant SC as "Smart Credit"
+participant LMS as "LMS"
+participant T24 as "T24"
+participant CCM as "CCM"
+
+Client -> IDO: Request TD and Overdraft by TD
+activate IDO
+IDO -> ROC: Forward request
+activate ROC
+ROC -> SC: Submit application for approval limit
+activate SC
+SC -> SC: Check request and grant limit
+SC --> ROC: Return approved limit
+deactivate SC
+ROC --> IDO: Return the list TD permitted to be used as collateral
+deactivate ROC
+IDO --> Client: Display the list TD permitted to be used as collateral
+Client -> IDO: Select TD and confirmation
+IDO -> ROC: Forward confirmation
+activate ROC
+ROC -> LMS: Send request to LMS to process TD loan disbursement
+activate LMS
+LMS -> T24: Lock TD
+activate T24
+T24 --> LMS: Return lock status / not lock if it already lock
+deactivate T24
+LMS -> T24: Create limit and write secure value
+activate T24
+T24 --> LMS: Return create limit status
+deactivate T24
+LMS -> CCM: Create collateral record
+activate CCM
+CCM --> LMS: Return collateral record status
+deactivate CCM
+LMS -> CCM: Link limit with collateral
+activate CCM
+CCM --> LMS: Return link status
+deactivate CCM
+LMS -> T24: Disbursement loan
+activate T24
+T24 --> LMS: Return disbursement status
+deactivate T24
+LMS --> ROC: Return TD loan disbursement status
+ROC --> IDO: Return TD loan disbursement status
+deactivate ROC
+deactivate IDO
+LMS -> CCM: Link limit with liability
+activate CCM
+CCM --> LMS: Return link status
+deactivate CCM
+
+@enduml

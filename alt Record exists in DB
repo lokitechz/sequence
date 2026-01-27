@@ -1,0 +1,170 @@
+alt Record exists in DB
+    note right of AME
+    Base on status of record to continue process
+    - INIT → Start call sub-account
+    - CREATE_SUB_ACCOUNT_SUCCESS → Create sub-account success and call create contact
+    - CREATE_CONTACT_SUCCESS → Create contact success and call create T24 account
+    end note
+
+    alt status = INIT
+        note right of AME
+        Before proceeding to Step 2, ensure valid CurrencyCloud token.
+        See separate diagram: 
+        end note
+
+        note right of AME
+        Step 2: Call CurrencyCloud to create sub-account
+        end note
+        AME -> ME: Create sub-account in CurrencyCloud
+        activate ME
+        ME -> CC: POST /v2/accounts/create
+        activate CC
+
+        alt API call success
+            CC --> ME: Return success response
+            deactivate CC
+            ME --> AME: Forward
+            deactivate ME
+            AME -> DB: Update record in table <b>visa_account_link</b>\nstatus = CREATE_SUB_ACCOUNT_SUCCESS
+            activate DB
+            DB --> AME: Update success
+            deactivate DB
+
+            note right of AME
+            Step 3: Call CurrencyCloud to create contact
+            end note
+            AME -> ME: Create contact in CurrencyCloud
+            activate ME
+            ME -> CC: POST /v2/contacts/create
+            activate CC
+            alt API call success
+                CC --> ME: Return success response
+                deactivate CC
+                ME --> AME: Forward
+                deactivate ME
+                AME -> DB: Insert contact into table <b>visa_contact</b>
+                activate DB
+                DB --> AME: Insert success
+                deactivate DB
+                AME -> DB: Update record in table <b>visa_account_link</b>\nstatus = CREATE_CONTACT_SUCCESS
+                activate DB
+                DB --> AME: Update success
+                deactivate DB
+
+                note right of AME
+                Step 4: Get SSI from CurrencyCloud match with currency request open account
+                end note
+                AME -> ME: Find SSI in CurrencyCloud
+                activate ME
+                ME -> CC: GET /v2/funding_accounts/find param: account_id, currency
+                activate CC
+                alt API call success
+                    CC --> ME: Return success response
+                    deactivate CC
+                    ME --> AME: Forward
+                    deactivate ME
+                    AME -> DB: Insert SSI info into table. <b>visa_account_ssi</b>
+                    activate DB
+                    DB --> AME: Insert success
+                    deactivate DB
+                    
+                    note right of AME
+                    Step 5: Create T24 account for currency request
+                    end note
+                    AME -> MI: Call T24 to create account\nPOST /internal/retails/v2/handle-account-services/create-account
+                    activate MI
+                    MI -> T24: Forward
+                    activate T24
+                    alt API call success
+                        T24 --> MI: Return success response
+                        deactivate T24
+                        MI --> AME: Forward
+                        deactivate MI
+                        AME -> DB: Update visa_account_link\nstatus = CREATE_T24_ACCOUNT_SUCCESS
+                        activate DB
+                        DB --> AME: Update success
+                        deactivate DB
+                    else API call failed
+                        T24 --> MI: Return error response (4xx/5xx)
+                        deactivate T24
+                        activate MI
+                        MI --> AME: Forward
+                        deactivate MI
+                        AME -> DB: Update visa_account_link\nstatus = CREATE_T24_ACCOUNT_FAILED
+                        activate DB
+                        DB --> AME: Update success
+                        deactivate DB
+                    end
+
+                    group Upload contract open account
+                        note right of AME
+                        Step 6: Upload contract to ECM system
+                        end note
+                        AME -> AME: Encrypt file
+                        AME -> ECM: Upload file to ECM\nPOST /openfncmis/services11/ObjectService
+                        activate ECM
+                        ECM --> AME: Return result
+                        deactivate ECM
+                    end
+
+                    group Trigger sync new account by call service API
+                        AME -> IG: POST /service-api/v2/accounts
+                        activate IG
+                        IG --> AME: Return result
+                        deactivate IG
+                        deactivate AME
+                    end
+
+                    AME -> EDGE: Return result
+                    EDGE -> TCB: Forward
+                    TCB -> Client: Display result
+
+                else API call failed
+                    CC --> ME: Return error response (4xx/5xx)
+                    ME --> AME: Forward
+                end
+
+            else API call failed
+                CC --> ME: Return error response (4xx/5xx)
+                deactivate CC
+                activate ME
+                ME --> AME: Forward
+                deactivate ME
+                AME -> DB: Update record in table <b>visa_account_link</b>\nstatus = CREATE_CONTACT_FAILED
+                activate DB
+                DB --> AME: Update success
+                deactivate DB
+                AME -> EDGE: Return response
+                deactivate AME
+                EDGE -> TCB: Forward
+                TCB -> Client: Display error message
+            end
+        else API call failed
+            CC --> ME: Return error response (4xx/5xx)
+            deactivate CC
+            activate ME
+            ME --> AME: Forward
+            deactivate ME
+            AME -> DB: Update record in table <b>visa_account_link</b> status = CREATE_SUB_ACCOUNT_FAILED
+            activate DB
+            DB --> AME: Update success
+            deactivate DB
+            AME -> EDGE: Return response
+            deactivate AME
+            EDGE -> TCB: Forward
+            TCB -> Client: Display error message
+        end
+
+    end
+
+else Record not found
+    AME -> DB: Insert new record (status = INIT)
+    activate DB
+    DB --> AME: Insert success
+    deactivate DB
+end
+
+AME -> EDGE: Return response
+deactivate AME
+EDGE -> TCB: Forward
+TCB -> Client: Display result

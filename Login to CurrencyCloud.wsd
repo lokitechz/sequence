@@ -1,0 +1,39 @@
+@startuml CurrencyCloud Authentication & Token Cache Flow (Cache handled in Mule External)
+
+autonumber "<b>[0]"
+actor Client
+participant "Mule External" as ME
+participant "Mule Object Store" as MOS
+participant "CurrencyCloud" as CC
+
+== Token Request ==
+ME -> MOS: GET access_token from Object Store
+alt Token not found or expired
+    ME -> CC: POST /v2/authenticate/api\n(login_id, api_key)
+    activate CC
+    alt API call success
+        CC --> ME: 200 OK {auth_token, expires_in=1500}
+        ME -> MOS: SET access_token = auth_token\nEXPIRE 1800s
+    else API call failed
+        CC --> ME: Return error result
+        deactivate CC
+    end
+else Token found
+    MOS --> ME: Return cached access_token
+    deactivate ME
+end
+
+== Token Expiration ==
+note over MOS: access_token expired automatically after 25 minutes
+ME -> CC: POST /v2/authenticate/api\n(login_id, api_key)
+activate CC
+alt API call success 
+    CC --> ME: 200 OK {auth_token, expires_in=1500}
+    ME -> MOS: SET access_token = auth_token\nEXPIRE 1500s
+    deactivate ME
+else API call failed
+    CC --> ME: Return error result
+    deactivate CC
+end
+
+@enduml

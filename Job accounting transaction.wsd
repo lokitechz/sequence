@@ -1,0 +1,41 @@
+@startuml Cronjob accounting transaction
+
+autonumber "<b>[0]"
+control "EKS Job" as EKS
+box Paylink
+participant "payment-order-fcy" as PO
+database "Paylink DB" as PLDB
+end box
+participant "Mule Internal" as MI
+participant "T24" as T24
+
+EKS -[#Red]> PO: Trigger job accounting transaction\nDaily at 12:00 PM and 18:00 PM
+activate PO
+PO -[#Red]> PLDB: Fetch transactions to be accounting\nstatus = <b>'COMPLETED'</b>\ncreated_at BETWEEN T AND T-1
+activate PLDB
+PLDB --[#Red]> PO: Return list of transactions
+deactivate PLDB
+loop For each transaction
+    PO -[#Red]> MI: Accounting transaction to T24
+    activate MI
+    MI -[#Red]> T24: POST /internal/bpm/v1/common-services/ft/internal/ac01
+    activate T24
+    T24 --[#Red]> MI: Return result of accounting transaction
+    deactivate T24
+    MI --[#Red]> PO: Foward
+    deactivate MI
+    alt T24 return any error or Timeout
+        PO -[#Red]> PLDB: Update transaction status to <b>'ACCOUNTING_FAIL'</b>
+        activate PLDB
+        PLDB --[#Red]> PO: Return result
+        deactivate PLDB
+    else other
+        PO -[#Red]> PLDB: Update status = 'ACCOUNTED'
+        activate PLDB
+        PLDB --[#Red]> PO
+        deactivate PLDB
+    end
+end
+deactivate PO
+
+@enduml

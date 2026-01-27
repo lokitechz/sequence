@@ -1,0 +1,31 @@
+@startuml Generate file contract
+
+autonumber "<b>[0]"
+actor Client
+box ROC
+participant "Techcombank Mobile" as TCB
+participant "Edge" as EDGE
+participant "arrangement-manager-extension" as AME
+database "arrangement-manager-extension" as DB
+end box
+
+Client -> TCB: Generate file contract
+TCB -> EDGE: Request get list currency\nGET /client-api/v1/visaxborder/contract/{customerId}
+EDGE -> EDGE: Check JWT token
+alt Auth failed
+    EDGE --> TCB: Return 401 Unauthorized
+    TCB --> Client: Display error message
+end
+EDGE -> AME: Forward
+activate AME
+AME -> DB: Get information contract\ncustomerId = :customerId
+activate DB
+DB --> AME: Return result
+deactivate DB
+AME -> AME: Fill data to contract template
+AME -> EDGE: Return file contract in base64
+deactivate AME
+EDGE --> TCB: Forward
+TCB --> Client: Display file contract
+
+@enduml
