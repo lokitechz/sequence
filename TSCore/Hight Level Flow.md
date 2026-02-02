@@ -5,7 +5,7 @@
 - AA: Arrangement Architecture
 - CCM: Centralized Collateral Management
 - EWS (Early warning system): 
-- LD: Loan Deposit
+- LD (Loan Deposit): 
 - OOTB -> Out of the box
 
 ## Các điểm key change của Retail Lending
