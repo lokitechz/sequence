@@ -16,3 +16,28 @@
 - Margin fix trong hợp đồng
 - Margin tính từ lúc giải ngân, review lãi suất định kì là T24
 - Lưu tất cả info và DB
+
+## Note 27-01-2026
+- Làm phong tỏa trước đổ tiền vào TK thanh toán
+- Hàng tháng nếu quá hạn là tất toán sổ luôn (cuối kì sử sổ tiết kiệm)
+- Sau 10 ngày tất toán
+- Ko customize gì ở T24
+- My cash on TD - CCM will handle and LMS
+
+- Sửa chính xác những gì màn hình nào
+- Lấy Epic trong delta log những yêu cầu nào của cần move ra
+- Có nhiều epic đi theo high level
+
+1. Book DL final GAP
+2. Ngồi với từng BA check từng GAP 1
+
+## Note 29-01-2026
+094: Đang thảo luận
+- AC.LOCKEVENTS
+- Số tiền kia là số lock
+- API đầu account number, lock amount and lock type
+- min/max 
+- customer type: MIN/MAX
+
+
+

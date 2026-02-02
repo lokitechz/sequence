@@ -2,8 +2,10 @@
 
 autonumber "<b>[0]"
 actor Client
+box ROC
 participant IDO as "IDO/TCB Mobile"
 participant ROC as "secured-lending-service"
+end box
 participant SC as "Smart Credit"
 participant LMS as "LMS"
 participant T24 as "T24"

@@ -3,8 +3,54 @@
 - BEP: hệ thống dành cho nhân viên TCB của doanh nghiệp
 - SC: Smart Credit
 - AA: Arrangement Architecture
+- CCM: Centralized Collateral Management
+- EWS (Early warning system): 
+- LD: Loan Deposit
+- OOTB -> Out of the box
 
-# Term Deposit and Overdraft by Term Deposit (Vay cầm cố sổ tiết kiệm và vay thấu chi cầm cố sổ tiết kiệm - Cầm cố 100% STK)
+## Các điểm key change của Retail Lending
+### 1. Lưu trữ mỗi quan hệ không ở trong collateral status
+- Tài sản bao gồm STK với nghĩa vụ trả nợ
+- Hạn mức với nghĩa vụ trả nợ - Bundle Mortgage
+- Nghĩa vụ trả nợ với nghĩa vụ trả nợ - Bundle Mortgage
+Các
+- Tách riêng nhiều loại hay 1 loại cho relationship type
+### Chi tiết cần sửa
+- LMS - Non STP
+    - Update luông mortgage -> BA sẽ cần ghi detail chi tiết các luồng - bạn Dung
+    - Sửa UI cho phép chọn 1 hoặc nhiều TSĐB - Hiện tại fix cứng dùng chính sổ mới mở để giảm thiểu rủi ro
+    - Sổ để giảm thiểu rủi ro chứ kp TSĐB
+    VD: Sổ 2 tỷ đảm bảo cho 1 tỷ 8
+- LMS - STP: Loambard loan và My cash on TD
+    - THêm 1 step để lưu mối quan hệ vào CCM
+    - Thêm kết nối từ LMS STP
+- Lombard loan ở quầy sẽ chuyển làm sang IDO làm hiện tại đang làm trên T24
+    - Process disburment và repayment thì đã có r
+    - Thêm UI mới trên IDO
+    - Đặt entry point
+
+### 2.Khi thực hiện repayment sẽ control được biz logic thì là centralize lại
+- IDO repayment chung cho các sản phẩm
+- New integration cho LMS - STP để biết call workflow repayment
+- Revolk quan hệ với CCM khi terminate khoản vay
+- Thêm workflow over due date với T24
+- Repayment theo batch
+- Revolk relationship sau khi repayment
+- Update monitor job để check validity hằng ngày
+
+### 3. Pricing
+- Đổi lấy AE+ pricing -> Sửa đúng phần giá
+- BA cần list ra bn endpoint
+- AE+ Pricing
+    - Thêm portal tạo campain và setup logic
+    - Config rule cho pricing
+- Portal set parameter trên databrick
+- Data bricks sẽ lấy động theo param
+
+### 4.Collection enhancement
+- Đã đóng thì sẽ đi theo bước 3
+
+## Term Deposit and Overdraft by Term Deposit (Vay cầm cố sổ tiết kiệm và vay thấu chi cầm cố sổ tiết kiệm - Cầm cố 100% STK)
 1. Tạo yêu cầu vay cầm cố sổ TD hoặc mở thấu chi cầm cố sổ TD(trên IDO hoặc TCB Mobile)
 
 2. ROC(secured-lending service) gửi yêu cầu approve limit lên Smart Credit -> Cấp hạn mức
@@ -23,7 +69,7 @@
 - Giải ngân cho khách hàng
 - Liên kết hạn mức với các trách nghiệm pháp lý
 
-### Q/A
+#### Q/A
 - **Check LTV là gì?** -> LTV = Loan to value
 - **Đang thấy có 2 step là ROC gọi CCM và SC gọi CCM?**
 - **Làm rõ write in secured value là gì?** Write secure value = Ghi nhận giá trị của tài sản đảm bảo
