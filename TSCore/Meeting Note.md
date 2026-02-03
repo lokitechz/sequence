@@ -40,4 +40,50 @@
 - customer type: MIN/MAX
 
 
+## Note 2-2-2026
+Brief: 
+- Sẽ chỉ handle phần key change và hollow out những gì T24 handle
+- Sẽ handle những gì T24 ko cover được
 
+- T24 đang store toàn bộ mối quan hệ -> Move ra store trên CCM
+
+1. Update mortgage journey
+- Sửa UI cho phép chọn nhiều tài sản đảm bảo
+- Lấy danh sách TSĐB từ CCM
+- Tích hợp với CCM để kiểm tra chập nhận TSĐB và lưu trữ mối quan hệ giữa STK/Tài sản với nghĩa vụ trả nợ
+- Không được nhận là tài sản đảm bảo nhưng vẫn cần store info (làm biện pháp giảm thiểu rủi ro) chỉ dừng lại ở bước store thông tin trên CCM
+- Chỉ có TD
+
+2. Update workflow giải ngân
+
+3. ROC
+- Có bảng local trên T24 để lưu
+- CCM sẽ lưu MyCash c9 bảo bên dưới
+
+4. Màn hình vay TD
+- New UI for IDO thuần túy query infomation
+- Thấu chi cầm cố STK và vay cầm cố STK sẽ cùng trên 1 màn của TD
+
+5. Repayment
+- Sẽ làm hết trên IDO
+- Chỉ kho lock sổ thành công thì mới disburment
+- Revoke relationship
+- Gồm cả KH trả nợ và trigger từ CCM
+- Repayment over due date mới từ đầu cover trigger đên
+    - KH có nhu cầu trả nợ quá hạn
+    - T24 đã có job chạy
+- Vendor phải expose API tiêu chuẩn phải trả ra 
+
+6. Terminate khoản vay chỉ cho Lombard
+- 
+
+7. Revoke relationship -> Không lưu mối quan hệ đó nữa nếu không khi check sẽ vẫn còn
+
+8. Entrusted loan
+
+Repayment over due date - LMS chưa có
+- DMS đổ data về cho LMS -> Tự động
+- Làm rõ thêm
+- Đang có 2 màn hình trên T24 (huong)
+    - Thu nợ theo ID 
+- Đang có API nợ quá hạn

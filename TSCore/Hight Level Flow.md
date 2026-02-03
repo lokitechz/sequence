@@ -7,6 +7,7 @@
 - EWS (Early warning system): 
 - LD (Loan Deposit): 
 - OOTB -> Out of the box
+- RCL ()
 
 ## Các điểm key change của Retail Lending
 ### 1. Lưu trữ mỗi quan hệ không ở trong collateral status
