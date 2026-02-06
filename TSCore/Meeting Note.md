@@ -87,3 +87,22 @@ Repayment over due date - LMS chưa có
 - Đang có 2 màn hình trên T24 (huong)
     - Thu nợ theo ID 
 - Đang có API nợ quá hạn
+
+Response time của các màn hình T24
+
+## Note 4-2-2026
+### DMS
+- Change Management(CM)
+    - Định hướng đào tạo
+    - 
+- Lock TD là bắt buộc trước khi đẩy xuống LMS để giải ngân
+- IDO -> Secure Lending service -> T24 Lock TD
+- IDO đã có
+- Repayment sẽ call LMS hết -> UI làm mới là màn hình riêng
+- Call để query info là ROC làm API mới lấy repayment amount cho từng khoản vay
+- Thay đổi cơ chế lấy lãi (xóa code cũ + đổi sang lấy mới)
+- Lãi suất áp dụng tại luồng giải ngân
+- PIL 
+- ROC check tài khoản
+
+## 
