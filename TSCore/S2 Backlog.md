@@ -19,3 +19,6 @@
     3. Disburstment
 - Các phần việc của pricing
     1. Cổng thông tin để tạo chương trình khuyến mại bán hàng và các logic của chương trình khuyến mại bán hàng
+
+    Slide kiến trúc này có thể dùng cho cả AE+ Backlog đã được define ở link sau
+    Kiến trúc này và yêu cầu của TD có nhiều điểm có thể cover cho Retail Lending 

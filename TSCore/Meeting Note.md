@@ -105,4 +105,8 @@ Response time của các màn hình T24
 - PIL 
 - ROC check tài khoản
 
-## 
+## 9-2-2026
+- Mục tiêu của Limit
+    - Direct Limit: Đã generate theo
+    - InDirect Limit: Limit
+- Quản lý chu trình của Limit
