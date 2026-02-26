@@ -110,3 +110,54 @@ Response time của các màn hình T24
     - Direct Limit: Đã generate theo
     - InDirect Limit: Limit
 - Quản lý chu trình của Limit
+- Cấp chung 1 tầng product
+    - Không phải chia nhỏ
+    - Nếu muốn chia nhỏ riêng thì tạo riêng 1 Limit riêng
+## 9-2-2026
+- Mục tiêu của Limit
+    - Direct Limit: Đã generate theo
+    - InDirect Limit: Limit
+- Quản lý chu trình của Limit
+- Cấp chung 1 tầng product
+    - Không phải chia nhỏ
+    - Nếu muốn chia nhỏ riêng thì tạo riêng 1 Limit riêng
+
+## 10-02-2026
+- Có 2 điểm trạm
+    - 1. Khi KH kí kết hợp đồng tín dụng với TCB sẽ thực hiện lấy giá và kí kết trên hợp đồng đó
+        - IDO, ROC, LMS sẽ gọi đến RBG Pricing
+        - Gồm 3 cấu phần
+            + Lãi suất cơ sở
+            + Biên độ của khách hàng: do RM cân đối -> là 1 số cụ thể 3%
+            + Sale Campain: Personalize -> là 1 số cụ thể 3%
+        - Sẽ sync up key và con số để KH view được con số từ T24
+        - Hiện tại CCM đã có expose 1 API
+        - Info hợp đồng đó lãi suất bao nhiêu: key ls là bn, -> Store tại AA
+    - 2. Period review
+        - Trigger đẩy đến Lake để cung cấp ngược về cho Pricing -> Pricing review và tính toán đẩy ngược về T24
+- AE+ Pricing
+    1. Phát sinh 1 portal mới để tạo sale campain mới
+        - Đặt sale campain code, thời gian + add điều kiện và logic của sale campain
+        - 2 luồng duyệt khác nhau
+    2. Chia làm 2 phần
+        - Pricing Engine: là excute rule
+            - Excute Rule
+            - Enrich chỉ dành cho AEP
+        - Portal: BPA
+            - Campaingn Code thuộc Bussiness Domain nào
+    3. Cách sử dụng AE+ Pricing
+        - Tạo Business Domain
+        - Indicator là các data feature của khách hàng
+        - Tạo Target Audience gom những indicator vào với nhau
+        - KQ tạo rule lưu bảng pp_dmn_rule
+        - Pricing Engine sẽ thụ hưởng
+## 12-02-2026
+- Trao đổi với LMS
+    - 1. Manual từ đầu không sinh bút toán gì hết
+    - 2. Khi hoạch toán lỗi thì sẽ lên T24 sẽ phải sang T24 hoạch toán tay
+    - Q: LMS có phải xây dựng các màn hình tương ứng hollowout từ T24 ra không
+    - IDO serve đc các TH adhoc
+    - Lock TD không nằm trên LMS và nếu hệ thống chết không cần màn hình trên LMS
+    - Onboard trên CCM
+## NOte
+- Làm song song technical upgrade và functional upgrade do muốn đóng hợp đồn tháng 7
