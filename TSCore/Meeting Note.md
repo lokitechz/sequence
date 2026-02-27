@@ -161,3 +161,37 @@ Response time của các màn hình T24
     - Onboard trên CCM
 ## NOte
 - Làm song song technical upgrade và functional upgrade do muốn đóng hợp đồn tháng 7
+
+## LMS giỏ
+- Đã thỏa mãn
+- Hệ thống 
+- IDO đẩy sang mặc định là auto
+- Disbursment - Thông tin đẩy từ SC sang -> Hiện tại đang may đo theo từng sản phẩm
+
+- R18 T24 giải ngân 
+- LMS đang vận hành như nào trên -> Ping dungnn3
+- Trước khi giải ngân check
+
+1. XĐ thằng TK đa
+2. Khi xđ thỏa mãn điều kiện r thì thông tin CCM sẽ quản lý , đến ngày đến 
+-> API lấy ra thông tin 
+3. Phong tỏa giải tỏa
+4. Mortgage on TD
+- Lấy thông tin cho
+
+### Mortgage on TD
+#### Luồng khởi tạo hồ sơ vay
+1. SC input thông tin sau đó sẽ đẩy hồ sơ sang LMS
+2. Khi có hồ sơ trên LMS sẽ soạn hồ sơ bằng file excel
+3. KH kí giấy tờ thế chấp
+4. Nhập kho tài sản làm trên T24
+5. Có 2 cách để giải ngân
+- Hạch toán trực tiếp trên T24 (Không dùng mấy trử trường hợp bất khả kháng)
+- Hoạch toán đổ lô bằng file excel (Cách hay được dùng)
+    - Sau khi hoạc toán thành công trên T24 -> T24 trả ra bút toán -> Người dùng sẽ nhập bút toán này vào hồ sơ trên LMS
+
+#### Luồng khởi tạo hồ sơ sau vay (thu nợ) và hoạch toán thu nơ
+1. LMS tạo hồ sơ thu nợ (Mang ý nghĩa lưu vết và không đẩy thông tin đi đâu)
+2. T24 thu nợ bằng tay
+3. Sau khi thu nợ trên T24 thành công sẽ quay lại LMS đánh dấu case 
+--> End luồng

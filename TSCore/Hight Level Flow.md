@@ -137,6 +137,3 @@ Các
 11. Camuda trigger task tất toán TD
 - **Thành công**: end luồng
 - **Thất bại**: trả ra mã lỗi và thực hiện rollback
-
-
-- Maker check dùng hiện tại chỉ có TD and Campain của AE Plus theo từng thời kì
