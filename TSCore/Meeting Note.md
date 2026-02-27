@@ -193,5 +193,5 @@ Response time của các màn hình T24
 #### Luồng khởi tạo hồ sơ sau vay (thu nợ) và hoạch toán thu nơ
 1. LMS tạo hồ sơ thu nợ (Mang ý nghĩa lưu vết và không đẩy thông tin đi đâu)
 2. T24 thu nợ bằng tay
-3. Sau khi thu nợ trên T24 thành công sẽ quay lại LMS đánh dấu case 
+3. Sau khi thu nợ trên T24 thành công sẽ quay lại LMS đánh dấu case là "Hồ sơ hoàn thành"
 --> End luồng
