@@ -191,7 +191,14 @@ Response time của các màn hình T24
     - Sau khi hoạc toán thành công trên T24 -> T24 trả ra bút toán -> Người dùng sẽ nhập bút toán này vào hồ sơ trên LMS
 
 #### Luồng khởi tạo hồ sơ sau vay (thu nợ) và hoạch toán thu nơ
+##### Thu nợ đến hạn
+1. T24 tự chạy job khi đến kì thu nợ (làm rõ logic chạy)
+
+##### Thu nợ 1 phần
 1. LMS tạo hồ sơ thu nợ (Mang ý nghĩa lưu vết và không đẩy thông tin đi đâu)
 2. T24 thu nợ bằng tay
 3. Sau khi thu nợ trên T24 thành công sẽ quay lại LMS đánh dấu case là "Hồ sơ hoàn thành"
 --> End luồng
+
+### 27-02-2026
+1. TCB làm gì toàn bộ phần liên quan đến vệ tinh và delta gap
