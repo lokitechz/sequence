@@ -22,3 +22,11 @@
 
     Slide kiến trúc này có thể dùng cho cả AE+ Backlog đã được define ở link sau
     Kiến trúc này và yêu cầu của TD có nhiều điểm có thể cover cho Retail Lending 
+
+- Lịch trả nợ có lưu trên LMS không
++ Gộp lại thì có đảm bảo 
++ Phong tỏa ở step 3 (đang dùng )
++ Tách ra để align với vendor
++ Dùng chung aclock event thì sẽ gộp số 3 với số 6
+
+

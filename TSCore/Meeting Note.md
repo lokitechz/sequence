@@ -202,3 +202,10 @@ Response time của các màn hình T24
 
 ### 27-02-2026
 1. TCB làm gì toàn bộ phần liên quan đến vệ tinh và delta gap
+2. AE+ Pricing
+    1. Bussiness nhìn lại xem cái portal đã đủ đáp ứng nhu cầu tạo sale campain chưa?
+    - Lúc nào lake có data feature mới thì portal có cần dev lại không?
+    2. Setup 1 cái rule
+    3. 
+    4. 
+    5. Portal
