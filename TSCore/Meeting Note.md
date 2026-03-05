@@ -180,7 +180,7 @@ Response time của các màn hình T24
 - Lấy thông tin cho
 
 ### Mortgage on TD
-#### Luồng khởi tạo hồ sơ vay
+#### Luồng khởi tạo hồ sơ vay và giải ngân
 1. SC input thông tin sau đó sẽ đẩy hồ sơ sang LMS
 2. Khi có hồ sơ trên LMS sẽ soạn hồ sơ bằng file excel
 3. KH kí giấy tờ thế chấp
@@ -209,3 +209,12 @@ Response time của các màn hình T24
     3. 
     4. 
     5. Portal
+    
+
+- Liên hệ với các BA của 
+
+- Mortgage with TD đem đi thế chấp và nhập kho
+
+- Mortgage on TD dùng sổ để làm biện pháp giảm thiểu rủi ro chứ không nhập kho tài sản
+
+- Sử dụng nguồn tiền của TD làm biện pháp thanh toán trong hạn, trước hạn hoặc tại 1 thời điểm nào đó
