@@ -151,6 +151,15 @@ Response time của các màn hình T24
         - Tạo Target Audience gom những indicator vào với nhau
         - KQ tạo rule lưu bảng pp_dmn_rule
         - Pricing Engine sẽ thụ hưởng
+
+    4. Rule được lấy từ các hệ thống khác nhau
+        - 30 product toàn bộ lending ko bao gồm thẻ
+        - Rule bao gồm mở mới và review
+            + Gồm giá cơ sở, giá fix
+            + Key LS cơ sở đồng bộ từ T24
+        - Setup rule có bao gồm rủi ro tín dụng LTV 
+        - Ondemand lấy ở DAH
+        - Review lấy dữ liệu từ lake đẩy param
 ## 12-02-2026
 - Trao đổi với LMS
     - 1. Manual từ đầu không sinh bút toán gì hết
@@ -218,3 +227,66 @@ Response time của các màn hình T24
 - Mortgage on TD dùng sổ để làm biện pháp giảm thiểu rủi ro chứ không nhập kho tài sản
 
 - Sử dụng nguồn tiền của TD làm biện pháp thanh toán trong hạn, trước hạn hoặc tại 1 thời điểm nào đó
+
+### 11-03-2026
+#### Backlog LMS
+- DMS có năng lực xử lý tất cả các các khoản nợ trên hệ thống chứ ko phải mỗi thẻ
+- DMS sẽ trả ra danh sách khách hàng và min hay max
+- LMS sẽ tính toán đc số tiền cần phong tỏa là bn dựa trên thông tin khách hàng gửi sang
+- Lake hoặc T24
+- Mong muốn realtime
+- Hiện tại: near realtime chậm tầm 30 phút
+- Chạy job vào 9h sáng cần biết nợ là bn
+- Cơ chế phong tỏa đang làm thủ công
+- Hiện tại trên T24 thu nợ số tối thiểu
+- Job thu nợ quá hạn
++ Thu cả phần chưa quá hạn
++ Dưới 60 ngày chỉ thu nợ quá hạn
+- DMS đẩy thông tin sang LMS lấy thông tin từ T24 vs Card xong tổng hợp dữ liệu
+- DMS có ngày trả ra data sớm có ngày muộn
+- DMS có realtime đc không hay LMS sẽ phải tự đi lấy
+
+1. Màn hình thu nợ
+- Màn hình FT
+
+Clear lại các hạng mục bên dưới
+
+2. Validate info
+    + Check xem có nợ quá hạn trên T24
+    + Check phân luồng nợ gọi đến DMS
+
+#### Backlog ROC
+- LMS tự động fill tài khoản giải ngân nếu ko truyền thông tin người thụ hưởng
+    + LMS chỉ đẩy thông tin -> ROC không cần sửa gì
+    + Luồng của PIL đang qua LMS
+- MyCash on TD và Lombard TD
+    + Giải ngân tại quầy move sang IDO
+    + Add thêm step kết nối sang CCM
+
+1. Hollowout ra cho đẹp hơn
+2. Nếu ko move thì bị charge nhiều tiền do đi kèm AA
+- Dòng 67, 68 đã estimate đúng chưa
+- Đã làm trên IDO cho Mycash on TD
+- Vendor khi sửa API có sửa endpoint
+- BIL mới có của unsecured chưa có secured
+3. Mule sửa vì T24 đổi endpoint còn hệ thống vệ tinh gọi Mule thì enpoint Mule giữ nguyên
+
+### 13-03-2026
+#### As is
+- Hiện tại có 1 file MD_Interest theo template
+    + Chưa phải file chuẩn nếu RBG đưa ra lãi suất mới
+    + Có chức năng upload file lãi xuất
+    + Ko cover được trong file thì sẽ phải tính bằng cơm và điền lại lên form của LMS
+    + Chỉ dành cho khoản vay mới
+    + Sửa giá trị trên file excel xong lại upload lại lên LMS
+- Điều chỉnh lãi xuất cho khoản vay hiện hữu
+    + Luồng ngoại lệ đang manual bên ngoài
+    + Hiện tại ngoại lệ đang tự nhập
+- Hiện tại không gọi qua bên nào
+- 1 sản phẩm có thể đi qua nhiều file excel khác nhau
+- Mong đợi
+    + Lãi suất
+    + Phí áp dụng cho từng sản phẩm
+    + Lịch trả nợ ko áp dụng cho AE+ Pricing
+- Đọc trc BRD Pricing
+- Tiêu chí nào, tính toán ra sao, expect mong muốn
