@@ -215,9 +215,6 @@ Response time của các màn hình T24
     1. Bussiness nhìn lại xem cái portal đã đủ đáp ứng nhu cầu tạo sale campain chưa?
     - Lúc nào lake có data feature mới thì portal có cần dev lại không?
     2. Setup 1 cái rule
-    3. 
-    4. 
-    5. Portal
     
 
 - Liên hệ với các BA của 
@@ -225,6 +222,7 @@ Response time của các màn hình T24
 - Mortgage with TD đem đi thế chấp và nhập kho
 
 - Mortgage on TD dùng sổ để làm biện pháp giảm thiểu rủi ro chứ không nhập kho tài sản
+    + **Có step nhập kho TSĐB cho TD -> Khai báo trên T24 như bình thường
 
 - Sử dụng nguồn tiền của TD làm biện pháp thanh toán trong hạn, trước hạn hoặc tại 1 thời điểm nào đó
 
@@ -290,3 +288,15 @@ Clear lại các hạng mục bên dưới
     + Lịch trả nợ ko áp dụng cho AE+ Pricing
 - Đọc trc BRD Pricing
 - Tiêu chí nào, tính toán ra sao, expect mong muốn
+
+### Meeting
+- Review
+    + Có 2 loại API
+    + Technical API
+        - Review request response
+
+Màn
+
+1. Ưu tiên làm non AA trước
+- Clear 10 màn 
+- Trên
