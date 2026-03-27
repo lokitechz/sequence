@@ -294,9 +294,3 @@ Clear lại các hạng mục bên dưới
     + Có 2 loại API
     + Technical API
         - Review request response
-
-Màn
-
-1. Ưu tiên làm non AA trước
-- Clear 10 màn 
-- Trên

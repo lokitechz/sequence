@@ -2,6 +2,7 @@
 ### 1. Enhancement for pricing
 - **Hiện trạng**: T24 không có module đáp ứng việc tùy chỉnh lãi suất hiện tại đang phải customize với nhiều hạn chế và ảnh hưởng đến hiệu suất của LD
 - **Giải pháp**: Tách riêng module cá nhân hóa giá cả ra 1 Platform riêng
+- **Chi tiết**: Chưa chốt có làm hay không
 ### 2. Accouting for Collateral
 - **Hiện trạng**: Hiện tại đang quản lý TSĐB trên T24
 - **Giải pháp**: Chuyển sang quản lý TSĐB trên CCM (Centralize Collateral Management)
