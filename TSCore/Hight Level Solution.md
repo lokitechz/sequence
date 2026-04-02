@@ -5,7 +5,8 @@
 - **Chi tiết**: Chưa chốt có làm hay không
 ### 2. Accouting for Collateral
 - **Hiện trạng**: Hiện tại đang quản lý TSĐB trên T24
-- **Giải pháp**: Chuyển sang quản lý TSĐB trên CCM (Centralize Collateral Management)
+- **Giải pháp**: Chuyển sang quản lý TSĐB trên CCM (Centralize Collateral Management) -> Phụ thuộc vào dự án RB12
+- **Giả định**: Dự án RB12 xong là sẽ có toàn bộ kết nối từ LMS sang CCM
 ### 3. Centralize the risk mitigation method of lending
 - **Hiện trạng**: Hiện tại đang quản lý mối quan hệ giữa tài sản và nợ phải trả trên T24
 - **Giải pháp**: Chuyển sang quản lý trên CCM
