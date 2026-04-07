@@ -1,8 +1,5 @@
 ## LMS
-## Các hạng mục cần sửa
-
-
-
+## Khái niệm
 - **Auto và Semi - Auto**: Bản chất là có tích hợp xuống T24 khi hoạch xong T24 sẽ sync về LMS
 - **Manual**: Thông tin không tích hợp gì với T24 mà sẽ là copy manual sau khi hoạch toán trên T24
 
@@ -206,3 +203,11 @@ Các
 11. Camuda trigger task tất toán TD
 - **Thành công**: end luồng
 - **Thất bại**: trả ra mã lỗi và thực hiện rollback
+
+2-4-2026
+- LMS 7 sang 8 là call API
+- Bổ sung thông tin về mối quan hệ ts xd xem ở trên SC hay LMS
+- Bước 7 sang bước 8 clear lại API Spec với RB12?
+- Luồng auto có thể đi như này, còn luồng manual sẽ hoạch tài sản như nào? Chắc chắn k làm trên T24
+- Hoạch toán TSĐB?
+

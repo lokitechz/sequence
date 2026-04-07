@@ -1,0 +1,13 @@
+## Meeting minute
+- Tribe 5
+    + Lead bảo sẽ làm platform
+    + Phần đổ lô của Tribe 2 bị remove đi và move sang Tribe 5
+    + Platform mà Tribe 5 là gì
+        + Ban đầu dự định xây dựng đổ platform mới trên 1 DB mới hoàn toàn
+        + Đổ lô sẽ giữ nguyên R18 như nào R25 sẽ như thế. (Chỉ áp dụng yc đổ lô excel hàng ngày)
+        + Những việc đó Tribe 5 sẽ đảm bảo phân hệ AA sẽ vẫn đáp ứng
+        + Việc bổ sung thêm file đổ lô mới sẽ tự do Tribe
+
+- Chờ AA lên
+- Tribe 5 sẽ đảm bảo việc lên AA sẽ cần config
+    -> Nếu lỗi sẽ phối hợp vs Tribe 5 để fix

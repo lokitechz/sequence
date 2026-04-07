@@ -298,3 +298,7 @@ Clear lại các hạng mục bên dưới
 ### Meeting 31-03-2026
 - Việc sắp tới review FSD và IDD
     + Check list 3 round review
+
+### Đồng bộ EAT TSCore 04-07-2026
+- Cái change trên T24 thay đổi có đúng k?
+- Hiểu được cái change đấy impact đến hệ thống vệ tinh như nào
