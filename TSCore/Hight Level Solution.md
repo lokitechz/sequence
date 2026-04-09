@@ -2,6 +2,7 @@
 - Đến từ 2 thứ
     + LD -> AA: Bị GAP nên nếu làm trên core là cần customize -> Vendor charge tiền khá nhiều
     + IT của Bussiness y/c hệ thống core phải đáp ứng tuy nhiên khi đánh giá với vendor thì core không đáp ứng được. Chỉ đáp ứng 1 phần và 1 phần hollow out ra ngoài
+    - LD -> AA: Move pricing ra do GAP XXL
 ### 1. Enhancement for pricing
 - **Hiện trạng**: T24 không có module đáp ứng việc tùy chỉnh lãi suất hiện tại đang phải customize với nhiều hạn chế và ảnh hưởng đến hiệu suất của LD
     - Hiện tại giá đang được tính toán trên T24
