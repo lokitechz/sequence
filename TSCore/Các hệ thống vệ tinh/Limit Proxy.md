@@ -2,7 +2,7 @@
 ### Mục tiêu
 - **Technical Upgrade** R18 lên R25 chức năng của Limit Module giữ nguyên
 - **Functional Upgrade**
-    + Đánh giá khi lên AA sẽ chỉ ảnh hưởng đến trong T24
+    + Đánh giá khi lên AA sẽ chỉ ảnh hưởng trong T24
     + Hiện tại đang dùng chung segment không y/c tạo bảng mã limit mới
     + FIN muốn theo dõi available limit -> Nếu bật tính năng này tạo ra khoảng 3tr tk kế toán nội bộ
 
