@@ -1,0 +1,91 @@
+<svg width="900" height="680" viewBox="0 0 900 680" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Kiro Agent Hook Definition Structure</title>
+  <desc>Visual representation of Kiro's agent hook file showing WHEN trigger, FILE PATTERN matching, and THEN action sections</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Outer container -->
+  <rect x="40" y="40" width="820" height="600" rx="16" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.5"/>
+
+  <!-- Header -->
+  <text x="450" y="78" text-anchor="middle" font-size="20" font-weight="700" fill="#2C2C2A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" letter-spacing="2">HOOK DEFINITION</text>
+  <text x="450" y="104" text-anchor="middle" font-size="14" fill="#5F5E5A" font-family="Menlo, Monaco, 'Courier New', monospace">(.kiro/hooks/*.kiro.hook)</text>
+
+  <!-- Header divider -->
+  <line x1="70" y1="125" x2="830" y2="125" stroke="#B4B2A9" stroke-width="1"/>
+
+  <!-- ========== SECTION 1: WHEN (Blue) ========== -->
+  <rect x="70" y="150" width="170" height="150" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5"/>
+  <text x="155" y="218" text-anchor="middle" font-size="22" font-weight="700" fill="#0C447C" font-family="Arial, sans-serif" letter-spacing="1">WHEN</text>
+  <text x="155" y="244" text-anchor="middle" font-size="14" fill="#185FA5" font-family="Arial, sans-serif">(Trigger)</text>
+
+  <!-- Dash connector -->
+  <line x1="245" y1="170" x2="275" y2="170" stroke="#185FA5" stroke-width="2"/>
+
+  <!-- Details -->
+  <text x="285" y="175" font-size="15" font-weight="700" fill="#0C447C" font-family="Arial, sans-serif">Event Trigger</text>
+
+  <g font-family="Arial, sans-serif" font-size="14" fill="#0C447C">
+    <circle cx="295" cy="200" r="2.5" fill="#185FA5"/>
+    <text x="306" y="204">File: created / saved / deleted</text>
+
+    <circle cx="295" cy="222" r="2.5" fill="#185FA5"/>
+    <text x="306" y="226">Prompt: submit / stop</text>
+
+    <circle cx="295" cy="244" r="2.5" fill="#185FA5"/>
+    <text x="306" y="248">Tool: pre / post use</text>
+
+    <circle cx="295" cy="266" r="2.5" fill="#185FA5"/>
+    <text x="306" y="270">Spec: pre / post task</text>
+
+    <circle cx="295" cy="288" r="2.5" fill="#185FA5"/>
+    <text x="306" y="292">Manual trigger</text>
+  </g>
+
+  <!-- Arrow 1 -->
+  <line x1="155" y1="305" x2="155" y2="345" stroke="#5F5E5A" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ========== SECTION 2: FILE PATTERN (Amber) ========== -->
+  <rect x="70" y="350" width="170" height="80" rx="10" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5"/>
+  <text x="155" y="383" text-anchor="middle" font-size="17" font-weight="700" fill="#633806" font-family="Arial, sans-serif" letter-spacing="0.5">FILE</text>
+  <text x="155" y="408" text-anchor="middle" font-size="17" font-weight="700" fill="#633806" font-family="Arial, sans-serif" letter-spacing="0.5">PATTERN</text>
+
+  <!-- Dash connector -->
+  <line x1="245" y1="390" x2="275" y2="390" stroke="#854F0B" stroke-width="2"/>
+
+  <!-- Details -->
+  <text x="285" y="385" font-size="15" font-weight="700" fill="#633806" font-family="Arial, sans-serif">Pattern Matching</text>
+  <text x="285" y="410" font-size="14" fill="#854F0B" font-family="Menlo, Monaco, 'Courier New', monospace">(e.g. src/**/*.tsx)</text>
+
+  <!-- Arrow 2 -->
+  <line x1="155" y1="435" x2="155" y2="475" stroke="#5F5E5A" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- ========== SECTION 3: THEN (Purple) ========== -->
+  <rect x="70" y="480" width="170" height="140" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+  <text x="155" y="543" text-anchor="middle" font-size="22" font-weight="700" fill="#3C3489" font-family="Arial, sans-serif" letter-spacing="1">THEN</text>
+  <text x="155" y="569" text-anchor="middle" font-size="14" fill="#534AB7" font-family="Arial, sans-serif">(Action)</text>
+
+  <!-- Dash connector -->
+  <line x1="245" y1="500" x2="275" y2="500" stroke="#534AB7" stroke-width="2"/>
+
+  <!-- Details -->
+  <text x="285" y="505" font-size="15" font-weight="700" fill="#3C3489" font-family="Arial, sans-serif">Agent Instructions</text>
+
+  <g font-family="Arial, sans-serif" font-size="14" fill="#3C3489">
+    <circle cx="295" cy="530" r="2.5" fill="#534AB7"/>
+    <text x="306" y="534">askAgent: prompt</text>
+
+    <circle cx="295" cy="554" r="2.5" fill="#534AB7"/>
+    <text x="306" y="558">Generate tests</text>
+
+    <circle cx="295" cy="578" r="2.5" fill="#534AB7"/>
+    <text x="306" y="582">Update docs</text>
+
+    <circle cx="295" cy="602" r="2.5" fill="#534AB7"/>
+    <text x="306" y="606">Run linting</text>
+  </g>
+</svg>

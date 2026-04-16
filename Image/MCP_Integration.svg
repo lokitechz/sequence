@@ -1,0 +1,128 @@
+<svg width="900" height="700" viewBox="0 0 900 700" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Kiro MCP Integration Architecture</title>
+  <desc>Kiro Agent's MCP Client Manager connecting to three types of MCP servers: Local, Remote, and Power (dynamic on-demand)</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- ========== KIRO AGENT CONTAINER ========== -->
+  <rect x="100" y="40" width="700" height="265" rx="16" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.5"/>
+
+  <!-- Container title -->
+  <text x="450" y="80" text-anchor="middle" font-size="14" font-weight="700" fill="#2C2C2A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif" letter-spacing="4">KIRO AGENT</text>
+
+  <!-- Title divider -->
+  <line x1="140" y1="95" x2="760" y2="95" stroke="#B4B2A9" stroke-width="1"/>
+
+  <!-- ========== MCP CLIENT MANAGER (inner box) ========== -->
+  <rect x="180" y="115" width="540" height="175" rx="12" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+
+  <!-- Manager title -->
+  <text x="450" y="150" text-anchor="middle" font-size="20" font-weight="700" fill="#3C3489" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif">MCP Client Manager</text>
+  <text x="450" y="172" text-anchor="middle" font-size="11" fill="#534AB7" font-family="Arial, sans-serif" letter-spacing="2">PROTOCOL ORCHESTRATION</text>
+
+  <!-- Bullets -->
+  <g font-family="Arial, sans-serif" font-size="14" fill="#2C2C2A">
+    <circle cx="250" cy="210" r="3" fill="#534AB7"/>
+    <text x="264" y="214"><tspan font-weight="600" fill="#3C3489">Connection pooling</tspan> <tspan fill="#888780">&#8212; maintain active sessions</tspan></text>
+
+    <circle cx="250" cy="238" r="3" fill="#534AB7"/>
+    <text x="264" y="242"><tspan font-weight="600" fill="#3C3489">Tool discovery</tspan> <tspan fill="#888780">&#8212; enumerate capabilities</tspan></text>
+
+    <circle cx="250" cy="266" r="3" fill="#534AB7"/>
+    <text x="264" y="270"><tspan font-weight="600" fill="#3C3489">Dynamic loading</tspan> <tspan fill="#888780">/ unloading per context</tspan></text>
+  </g>
+
+  <!-- ========== BRANCHING ARROWS ========== -->
+
+  <!-- Main vertical from Manager bottom -->
+  <line x1="450" y1="290" x2="450" y2="345" stroke="#5F5E5A" stroke-width="2"/>
+
+  <!-- Horizontal branch line -->
+  <line x1="200" y1="345" x2="700" y2="345" stroke="#5F5E5A" stroke-width="2"/>
+
+  <!-- 3 down arrows with arrowheads -->
+  <line x1="200" y1="345" x2="200" y2="400" stroke="#5F5E5A" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="450" y1="345" x2="450" y2="400" stroke="#5F5E5A" stroke-width="2" marker-end="url(#arrow)"/>
+  <line x1="700" y1="345" x2="700" y2="400" stroke="#5F5E5A" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Junction dots -->
+  <circle cx="200" cy="345" r="3.5" fill="#5F5E5A"/>
+  <circle cx="450" cy="345" r="3.5" fill="#5F5E5A"/>
+  <circle cx="700" cy="345" r="3.5" fill="#5F5E5A"/>
+
+  <!-- ========== BOX 1: LOCAL MCP (Teal) ========== -->
+  <rect x="90" y="410" width="220" height="230" rx="12" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+  <rect x="90" y="410" width="220" height="4" fill="#0F6E56"/>
+
+  <text x="110" y="442" font-size="11" font-weight="700" fill="#0F6E56" font-family="Arial, sans-serif" letter-spacing="1.5">LOCAL</text>
+  <text x="110" y="470" font-size="20" font-weight="700" fill="#085041" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif">MCP Server</text>
+
+  <line x1="110" y1="490" x2="290" y2="490" stroke="#0F6E56" stroke-width="1" opacity="0.3"/>
+
+  <g font-family="Arial, sans-serif" font-size="14" fill="#085041">
+    <circle cx="120" cy="518" r="3" fill="#0F6E56"/>
+    <text x="132" y="522">GitHub</text>
+
+    <circle cx="120" cy="545" r="3" fill="#0F6E56"/>
+    <text x="132" y="549">File system</text>
+
+    <circle cx="120" cy="572" r="3" fill="#0F6E56"/>
+    <text x="132" y="576">Docker</text>
+  </g>
+
+  <line x1="110" y1="600" x2="290" y2="600" stroke="#0F6E56" stroke-width="1" opacity="0.3"/>
+  <text x="110" y="622" font-size="11" fill="#0F6E56" font-family="Menlo, Monaco, 'Courier New', monospace" font-style="italic">stdio connection</text>
+
+  <!-- ========== BOX 2: REMOTE MCP (Blue) ========== -->
+  <rect x="340" y="410" width="220" height="230" rx="12" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5"/>
+  <rect x="340" y="410" width="220" height="4" fill="#185FA5"/>
+
+  <text x="360" y="442" font-size="11" font-weight="700" fill="#185FA5" font-family="Arial, sans-serif" letter-spacing="1.5">REMOTE</text>
+  <text x="360" y="470" font-size="20" font-weight="700" fill="#0C447C" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif">MCP Server</text>
+
+  <line x1="360" y1="490" x2="540" y2="490" stroke="#185FA5" stroke-width="1" opacity="0.3"/>
+
+  <g font-family="Arial, sans-serif" font-size="14" fill="#0C447C">
+    <circle cx="370" cy="518" r="3" fill="#185FA5"/>
+    <text x="382" y="522">JIRA</text>
+
+    <circle cx="370" cy="545" r="3" fill="#185FA5"/>
+    <text x="382" y="549">Confluence</text>
+
+    <circle cx="370" cy="572" r="3" fill="#185FA5"/>
+    <text x="382" y="576">Slack</text>
+  </g>
+
+  <line x1="360" y1="600" x2="540" y2="600" stroke="#185FA5" stroke-width="1" opacity="0.3"/>
+  <text x="360" y="622" font-size="11" fill="#185FA5" font-family="Menlo, Monaco, 'Courier New', monospace" font-style="italic">SSE / HTTP connection</text>
+
+  <!-- ========== BOX 3: POWER MCP (Amber) ========== -->
+  <rect x="590" y="410" width="220" height="230" rx="12" fill="#FAEEDA" stroke="#BA7517" stroke-width="1.5"/>
+  <rect x="590" y="410" width="220" height="4" fill="#BA7517"/>
+
+  <text x="610" y="442" font-size="11" font-weight="700" fill="#BA7517" font-family="Arial, sans-serif" letter-spacing="1.5">DYNAMIC</text>
+  <text x="610" y="470" font-size="20" font-weight="700" fill="#633806" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif">Power MCP</text>
+
+  <line x1="610" y1="490" x2="790" y2="490" stroke="#BA7517" stroke-width="1" opacity="0.3"/>
+
+  <g font-family="Arial, sans-serif" font-size="14" fill="#633806">
+    <circle cx="620" cy="518" r="3" fill="#BA7517"/>
+    <text x="632" y="522">Stripe</text>
+
+    <circle cx="620" cy="545" r="3" fill="#BA7517"/>
+    <text x="632" y="549">Supabase</text>
+
+    <circle cx="620" cy="572" r="3" fill="#BA7517"/>
+    <text x="632" y="576">Figma</text>
+  </g>
+
+  <line x1="610" y1="600" x2="790" y2="600" stroke="#BA7517" stroke-width="1" opacity="0.3"/>
+  <text x="610" y="622" font-size="11" fill="#BA7517" font-family="Menlo, Monaco, 'Courier New', monospace" font-style="italic">on-demand load / unload</text>
+
+  <!-- Footer caption -->
+  <text x="450" y="675" text-anchor="middle" font-size="12" fill="#888780" font-family="Arial, sans-serif" font-style="italic">Three MCP server types managed uniformly through the MCP Client Manager</text>
+</svg>
