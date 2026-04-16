@@ -9,7 +9,7 @@
     - ROC đang handle 1 phần
     - Nếu giữ nguyên cách hiện tại sử dụng cơ chế key lãi suất tạo ra các bảng key lãi suất mapping và dựa vào customer info để biết map với key nào và bộ key bị limit về mặt số lượng. Vendor tư vấn không nên sử dụng theo cách này nữa và sẽ có 1 lúc bị limit không sinh ra thêm được -> Move ra ngoài core
     - Theo thông tin mới nhất
-        + MFT Unsecured a Tuấn khối RBG sẽ handle toàn bọ RBG pricing -> Sẽ handle cả phần này
+        + MFT Unsecured a Tuấn khối RBG sẽ handle toàn bộ RBG pricing -> Sẽ handle cả phần này
 - **Giải pháp**: Tách riêng module cá nhân hóa giá cả ra 1 Platform riêng (Chưa chắc phải làm)
 - **Chi tiết**: Chưa chốt có làm hay không
 ### 2. Accouting for Collateral
@@ -67,3 +67,7 @@
     - File nhận đc từ entrusted loan từ Home Credit
 - **Giải pháp**: Thiết lập sản phẩm cho vay AA cho các khoản vay ủy thác
     - Parse file bên ngoài đẩy vào T24 one by one
+
+### Repyament
+- Tháng này thêm 100tr
+- Tạo 1 lệnh LMS 

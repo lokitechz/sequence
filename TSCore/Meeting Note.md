@@ -302,3 +302,8 @@ Clear lại các hạng mục bên dưới
 ### Đồng bộ EAT TSCore 04-07-2026
 - Cái change trên T24 thay đổi có đúng k?
 - Hiểu được cái change đấy impact đến hệ thống vệ tinh như nào
+
+### Meeting 10-04-2026
+- A Chính DL
+- Form lại team
+- Test plan

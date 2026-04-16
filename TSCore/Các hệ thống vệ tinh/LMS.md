@@ -1,7 +1,10 @@
 ## LMS
 ## Khái niệm
 - **Auto và Semi - Auto**: Bản chất là có tích hợp xuống T24 khi hoạch xong T24 sẽ sync về LMS
+    - Auto thì hạch thẳng từ LMS sang T24 - Đã có API
+    - Áp dụng cho mọi loại tài sản
 - **Manual**: Thông tin không tích hợp gì với T24 mà sẽ là copy manual sau khi hoạch toán trên T24
+    - Manual thì sẽ sử dụng file đổ lô - Nếu trong TH lỗi gì đó thì mới hạch tay thẳng trên T24 (hi hữu)
 
 - 1 luồng repayment cho ROC: sẽ không qua portal
     - LMS ở đây là 1 service chạy ngầm
@@ -211,3 +214,20 @@ Các
 - Luồng auto có thể đi như này, còn luồng manual sẽ hoạch tài sản như nào? Chắc chắn k làm trên T24
 - Hoạch toán TSĐB?
 
+## LMS
+Mapping giữa version hiện tại
+1. API đang lệch trường cần phương án xử lý?
+2. Chưa book nguồn lực
+
+**Technical Upgrade**
+- Keep As-is như hiện tại
+
+**Functional Upgrade**
+1. Non-AA thì sẽ chuyển lên IRIS
+2. AA thì sẽ phải redesign
+- Pricing sẽ làm
+
+3. Các việc cần làm
+- CCM scope
+- CCM với TD dự án RB12 có làm ko
+- Nếu không
