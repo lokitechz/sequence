@@ -1,0 +1,238 @@
+<svg width="1200" height="900" viewBox="0 0 1200 900" xmlns="http://www.w3.org/2000/svg" role="img">
+  <title>Kiro Infrastructure Design</title>
+  <desc>Infrastructure architecture of Kiro platform: client tier, AWS multi-region deployment, AI backend, autonomous agent runtime, and external service integrations</desc>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- ============ TITLE ============ -->
+  <text x="600" y="32" text-anchor="middle" font-size="22" font-weight="700" fill="#2C2C2A" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif">Kiro infrastructure design</text>
+
+  <!-- ============ TIER 1: CLIENTS ============ -->
+  <text x="60" y="72" font-size="11" font-weight="700" fill="#5F5E5A" font-family="Arial, sans-serif" letter-spacing="2">CLIENT TIER · DEVELOPER WORKSTATIONS</text>
+
+  <!-- Kiro IDE -->
+  <rect x="100" y="85" width="240" height="75" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5"/>
+  <rect x="100" y="85" width="240" height="4" fill="#185FA5"/>
+  <text x="220" y="115" text-anchor="middle" font-size="16" font-weight="700" fill="#0C447C" font-family="Arial, sans-serif">Kiro IDE</text>
+  <text x="220" y="134" text-anchor="middle" font-size="12" fill="#185FA5" font-family="Arial, sans-serif">VS Code fork · Desktop</text>
+  <text x="220" y="152" text-anchor="middle" font-size="10" fill="#185FA5" font-family="Menlo, monospace">HTTPS / WSS · respects proxy</text>
+
+  <!-- Kiro CLI -->
+  <rect x="380" y="85" width="240" height="75" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5"/>
+  <rect x="380" y="85" width="240" height="4" fill="#185FA5"/>
+  <text x="500" y="115" text-anchor="middle" font-size="16" font-weight="700" fill="#0C447C" font-family="Arial, sans-serif">Kiro CLI</text>
+  <text x="500" y="134" text-anchor="middle" font-size="12" fill="#185FA5" font-family="Arial, sans-serif">Terminal · SSH / headless</text>
+  <text x="500" y="152" text-anchor="middle" font-size="10" fill="#185FA5" font-family="Menlo, monospace">HTTPS · respects proxy</text>
+
+  <!-- Browser -->
+  <rect x="660" y="85" width="240" height="75" rx="10" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5"/>
+  <rect x="660" y="85" width="240" height="4" fill="#185FA5"/>
+  <text x="780" y="115" text-anchor="middle" font-size="16" font-weight="700" fill="#0C447C" font-family="Arial, sans-serif">Browser</text>
+  <text x="780" y="134" text-anchor="middle" font-size="12" fill="#185FA5" font-family="Arial, sans-serif">OAuth sign-in flow</text>
+  <text x="780" y="152" text-anchor="middle" font-size="10" fill="#185FA5" font-family="Menlo, monospace">OS stack · bypasses proxy</text>
+
+  <!-- ============ INTERNET BOUNDARY ============ -->
+  <line x1="60" y1="190" x2="1140" y2="190" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="6 4"/>
+  <rect x="540" y="180" width="120" height="20" rx="10" fill="#FDFCFA" stroke="#B4B2A9" stroke-width="1"/>
+  <text x="600" y="194" text-anchor="middle" font-size="10" font-weight="700" fill="#888780" font-family="Arial, sans-serif" letter-spacing="2">INTERNET · TLS</text>
+
+  <!-- Arrows from clients down through internet to AWS -->
+  <line x1="220" y1="160" x2="220" y2="215" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="500" y1="160" x2="500" y2="215" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <line x1="780" y1="160" x2="780" y2="215" stroke="#888780" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- ============ AWS CLOUD CONTAINER ============ -->
+  <rect x="40" y="220" width="860" height="600" rx="20" fill="#FDFCFA" stroke="#5F5E5A" stroke-width="1.5"/>
+  <text x="60" y="250" font-size="14" font-weight="700" fill="#2C2C2A" font-family="Arial, sans-serif" letter-spacing="2">AWS CLOUD INFRASTRUCTURE</text>
+  <rect x="745" y="235" width="140" height="20" rx="10" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+  <text x="815" y="249" text-anchor="middle" font-size="10" font-weight="700" fill="#633806" font-family="Arial, sans-serif" letter-spacing="1">OPTIONAL · PRIVATELINK</text>
+
+  <!-- ============ LAYER 1: EDGE / AUTH ============ -->
+  <text x="60" y="287" font-size="10" font-weight="700" fill="#888780" font-family="Arial, sans-serif" letter-spacing="1.5">EDGE · AUTH · CDN</text>
+
+  <!-- Auth Gateway -->
+  <rect x="70" y="295" width="400" height="70" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+  <rect x="70" y="295" width="4" height="70" fill="#534AB7"/>
+  <text x="90" y="318" font-size="15" font-weight="700" fill="#3C3489" font-family="Arial, sans-serif">Authentication gateway</text>
+  <text x="90" y="338" font-size="11" font-family="Menlo, monospace" fill="#534AB7">app.kiro.dev · prod.*.auth.desktop.kiro.dev</text>
+  <text x="90" y="356" font-size="11" fill="#888780" font-family="Arial, sans-serif">Token exchange · refresh · logout</text>
+
+  <!-- Download CDN -->
+  <rect x="490" y="295" width="400" height="70" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+  <rect x="490" y="295" width="4" height="70" fill="#534AB7"/>
+  <text x="510" y="318" font-size="15" font-weight="700" fill="#3C3489" font-family="Arial, sans-serif">Download &amp; update CDN</text>
+  <text x="510" y="338" font-size="11" font-family="Menlo, monospace" fill="#534AB7">prod.download.desktop.kiro.dev</text>
+  <text x="510" y="356" font-size="11" fill="#888780" font-family="Arial, sans-serif">Auto-updates · Powers registry · icons</text>
+
+  <!-- Connector down to regions -->
+  <line x1="480" y1="375" x2="480" y2="405" stroke="#888780" stroke-width="1.5"/>
+
+  <!-- ============ LAYER 2: MULTI-REGION ============ -->
+  <rect x="60" y="400" width="820" height="245" rx="14" fill="#F1EFE8" stroke="#B4B2A9" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="80" y="425" font-size="10" font-weight="700" fill="#5F5E5A" font-family="Arial, sans-serif" letter-spacing="1.5">REGIONAL SERVICES · MULTI-REGION DEPLOYMENT</text>
+
+  <!-- REGION 1: US-EAST-1 -->
+  <rect x="80" y="440" width="255" height="190" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+  <rect x="80" y="440" width="255" height="4" fill="#0F6E56"/>
+  <text x="95" y="465" font-size="10" font-weight="700" fill="#0F6E56" font-family="Arial, sans-serif" letter-spacing="1.5">COMMERCIAL · PRIMARY</text>
+  <text x="95" y="487" font-size="16" font-weight="700" fill="#085041" font-family="Arial, sans-serif">US-East-1</text>
+  <line x1="95" y1="497" x2="320" y2="497" stroke="#0F6E56" stroke-width="0.5" opacity="0.3"/>
+
+  <g font-family="Arial, sans-serif" font-size="12" fill="#085041">
+    <circle cx="105" cy="518" r="2.5" fill="#0F6E56"/>
+    <text x="115" y="522"><tspan font-weight="600">Auth</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">prod.us-east-1.auth</tspan></text>
+
+    <circle cx="105" cy="540" r="2.5" fill="#0F6E56"/>
+    <text x="115" y="544"><tspan font-weight="600">Runtime</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">runtime.us-east-1</tspan></text>
+
+    <circle cx="105" cy="562" r="2.5" fill="#0F6E56"/>
+    <text x="115" y="566"><tspan font-weight="600">Management</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">management.us-east-1</tspan></text>
+
+    <circle cx="105" cy="584" r="2.5" fill="#0F6E56"/>
+    <text x="115" y="588"><tspan font-weight="600">Telemetry</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">telemetry.us-east-1</tspan></text>
+
+    <circle cx="105" cy="606" r="2.5" fill="#0F6E56"/>
+    <text x="115" y="610"><tspan font-weight="600">Amazon Q</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">q.us-east-1</tspan></text>
+  </g>
+
+  <!-- REGION 2: EU-CENTRAL-1 -->
+  <rect x="352" y="440" width="255" height="190" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+  <rect x="352" y="440" width="255" height="4" fill="#0F6E56"/>
+  <text x="367" y="465" font-size="10" font-weight="700" fill="#0F6E56" font-family="Arial, sans-serif" letter-spacing="1.5">COMMERCIAL · EU</text>
+  <text x="367" y="487" font-size="16" font-weight="700" fill="#085041" font-family="Arial, sans-serif">EU-Central-1</text>
+  <line x1="367" y1="497" x2="592" y2="497" stroke="#0F6E56" stroke-width="0.5" opacity="0.3"/>
+
+  <g font-family="Arial, sans-serif" font-size="12" fill="#085041">
+    <circle cx="377" cy="518" r="2.5" fill="#0F6E56"/>
+    <text x="387" y="522"><tspan font-weight="600">Auth</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">regional endpoint</tspan></text>
+
+    <circle cx="377" cy="540" r="2.5" fill="#0F6E56"/>
+    <text x="387" y="544"><tspan font-weight="600">Runtime</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">runtime.eu-central-1</tspan></text>
+
+    <circle cx="377" cy="562" r="2.5" fill="#0F6E56"/>
+    <text x="387" y="566"><tspan font-weight="600">Management</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">management.eu-central-1</tspan></text>
+
+    <circle cx="377" cy="584" r="2.5" fill="#0F6E56"/>
+    <text x="387" y="588"><tspan font-weight="600">Telemetry</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">telemetry.eu-central-1</tspan></text>
+
+    <circle cx="377" cy="606" r="2.5" fill="#0F6E56"/>
+    <text x="387" y="610"><tspan font-weight="600">Amazon Q</tspan> <tspan fill="#0F6E56" font-family="Menlo, monospace">q.eu-central-1</tspan></text>
+  </g>
+
+  <!-- REGION 3: GOVCLOUD -->
+  <rect x="624" y="440" width="240" height="190" rx="10" fill="#FAEEDA" stroke="#BA7517" stroke-width="1.5"/>
+  <rect x="624" y="440" width="240" height="4" fill="#BA7517"/>
+  <text x="639" y="465" font-size="10" font-weight="700" fill="#BA7517" font-family="Arial, sans-serif" letter-spacing="1.5">GOVCLOUD · FIPS 140-2</text>
+  <text x="639" y="487" font-size="16" font-weight="700" fill="#633806" font-family="Arial, sans-serif">US-Gov-East / West</text>
+  <line x1="639" y1="497" x2="849" y2="497" stroke="#BA7517" stroke-width="0.5" opacity="0.3"/>
+
+  <g font-family="Arial, sans-serif" font-size="12" fill="#633806">
+    <circle cx="649" cy="518" r="2.5" fill="#BA7517"/>
+    <text x="659" y="522"><tspan font-weight="600">FIPS endpoint</tspan></text>
+
+    <circle cx="649" cy="540" r="2.5" fill="#BA7517"/>
+    <text x="659" y="544" font-family="Menlo, monospace" font-size="11">q-fips.us-gov-east-1</text>
+
+    <circle cx="649" cy="562" r="2.5" fill="#BA7517"/>
+    <text x="659" y="566" font-family="Menlo, monospace" font-size="11">q-fips.us-gov-west-1</text>
+
+    <circle cx="649" cy="592" r="2.5" fill="#BA7517"/>
+    <text x="659" y="596" font-size="11" fill="#888780">Regulated workloads</text>
+
+    <circle cx="649" cy="614" r="2.5" fill="#BA7517"/>
+    <text x="659" y="618" font-size="11" fill="#888780">Isolated from commercial</text>
+  </g>
+
+  <!-- Connector from regions down to AI backend -->
+  <line x1="480" y1="645" x2="480" y2="675" stroke="#888780" stroke-width="1.5"/>
+
+  <!-- ============ LAYER 3: AI BACKEND ============ -->
+  <rect x="60" y="670" width="820" height="135" rx="14" fill="#FAECE7" stroke="#993C1D" stroke-width="1" stroke-dasharray="4 3"/>
+  <text x="80" y="693" font-size="10" font-weight="700" fill="#712B13" font-family="Arial, sans-serif" letter-spacing="1.5">AI BACKEND · INFERENCE &amp; STATE</text>
+
+  <!-- LLM Gateway / Claude API -->
+  <rect x="80" y="705" width="390" height="85" rx="10" fill="#FFFFFF" stroke="#993C1D" stroke-width="1.5"/>
+  <rect x="80" y="705" width="4" height="85" fill="#993C1D"/>
+  <text x="100" y="728" font-size="15" font-weight="700" fill="#712B13" font-family="Arial, sans-serif">Anthropic Claude API</text>
+  <text x="100" y="748" font-size="12" fill="#993C1D" font-family="Arial, sans-serif">Claude Sonnet 4.5 · Auto mode (multi-model)</text>
+  <text x="100" y="766" font-size="11" fill="#888780" font-family="Arial, sans-serif">Model routing · caching · rate limiting</text>
+  <text x="100" y="782" font-size="10" fill="#888780" font-family="Menlo, monospace">inference gateway</text>
+
+  <!-- Autonomous Agent Runtime -->
+  <rect x="490" y="705" width="390" height="85" rx="10" fill="#FFFFFF" stroke="#993C1D" stroke-width="1.5"/>
+  <rect x="490" y="705" width="4" height="85" fill="#993C1D"/>
+  <text x="510" y="728" font-size="15" font-weight="700" fill="#712B13" font-family="Arial, sans-serif">Autonomous agent runtime</text>
+  <text x="510" y="748" font-size="12" fill="#993C1D" font-family="Arial, sans-serif">Persistent context · multi-repo queue</text>
+  <text x="510" y="766" font-size="11" fill="#888780" font-family="Arial, sans-serif">Cloud-based · learns from PR feedback</text>
+  <text x="510" y="782" font-size="10" fill="#888780" font-family="Menlo, monospace">long-running task execution</text>
+
+  <!-- ============ RIGHT PANEL: EXTERNAL INTEGRATIONS ============ -->
+  <rect x="920" y="220" width="260" height="600" rx="20" fill="#FDFCFA" stroke="#B4B2A9" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <text x="940" y="250" font-size="14" font-weight="700" fill="#2C2C2A" font-family="Arial, sans-serif" letter-spacing="2">EXTERNAL</text>
+  <text x="940" y="268" font-size="10" font-weight="700" fill="#888780" font-family="Arial, sans-serif" letter-spacing="1.5">THIRD-PARTY · DIRECT CLIENT CONN</text>
+
+  <!-- IAM Identity Center -->
+  <rect x="940" y="290" width="220" height="62" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+  <text x="955" y="311" font-size="13" font-weight="700" fill="#633806" font-family="Arial, sans-serif">IAM Identity Center</text>
+  <text x="955" y="328" font-size="10" font-family="Menlo, monospace" fill="#BA7517">&lt;directory&gt;.awsapps.com</text>
+  <text x="955" y="343" font-size="10" fill="#888780" font-family="Arial, sans-serif">Enterprise SSO</text>
+
+  <!-- External IdPs -->
+  <rect x="940" y="362" width="220" height="62" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+  <text x="955" y="383" font-size="13" font-weight="700" fill="#633806" font-family="Arial, sans-serif">External IdPs</text>
+  <text x="955" y="400" font-size="10" font-family="Menlo, monospace" fill="#BA7517">login.microsoftonline.com</text>
+  <text x="955" y="415" font-size="10" font-family="Menlo, monospace" fill="#BA7517">*.okta.com</text>
+
+  <!-- Stripe Billing -->
+  <rect x="940" y="434" width="220" height="62" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+  <text x="955" y="455" font-size="13" font-weight="700" fill="#633806" font-family="Arial, sans-serif">Stripe billing</text>
+  <text x="955" y="472" font-size="10" font-family="Menlo, monospace" fill="#BA7517">billing · checkout.stripe.com</text>
+  <text x="955" y="487" font-size="10" fill="#888780" font-family="Arial, sans-serif">Non-enterprise only</text>
+
+  <!-- Open VSX -->
+  <rect x="940" y="506" width="220" height="62" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+  <text x="955" y="527" font-size="13" font-weight="700" fill="#633806" font-family="Arial, sans-serif">Open VSX Registry</text>
+  <text x="955" y="544" font-size="10" font-family="Menlo, monospace" fill="#BA7517">open-vsx.org</text>
+  <text x="955" y="559" font-size="10" fill="#888780" font-family="Arial, sans-serif">IDE extensions · marketplace</text>
+
+  <!-- GitHub -->
+  <rect x="940" y="578" width="220" height="62" rx="8" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+  <text x="955" y="599" font-size="13" font-weight="700" fill="#633806" font-family="Arial, sans-serif">GitHub</text>
+  <text x="955" y="616" font-size="10" font-family="Menlo, monospace" fill="#BA7517">github.com · raw.github...</text>
+  <text x="955" y="631" font-size="10" fill="#888780" font-family="Arial, sans-serif">Powers / MCP repos</text>
+
+  <!-- VPC PrivateLink -->
+  <rect x="940" y="650" width="220" height="62" rx="8" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+  <text x="955" y="671" font-size="13" font-weight="700" fill="#3C3489" font-family="Arial, sans-serif">VPC endpoints</text>
+  <text x="955" y="688" font-size="10" font-family="Menlo, monospace" fill="#534AB7">AWS PrivateLink</text>
+  <text x="955" y="703" font-size="10" fill="#888780" font-family="Arial, sans-serif">Private connectivity · data perimeter</text>
+
+  <!-- Side panel footer note -->
+  <text x="940" y="735" font-size="10" fill="#888780" font-family="Arial, sans-serif" font-style="italic">Proxy environment:</text>
+  <text x="940" y="752" font-size="10" font-family="Menlo, monospace" fill="#888780">HTTP_PROXY · HTTPS_PROXY</text>
+  <text x="940" y="768" font-size="10" font-family="Menlo, monospace" fill="#888780">NO_PROXY · respected by IDE</text>
+
+  <!-- ============ FOOTER LEGEND ============ -->
+  <g font-family="Arial, sans-serif" font-size="11" fill="#5F5E5A">
+    <rect x="60" y="850" width="14" height="14" rx="3" fill="#E6F1FB" stroke="#185FA5" stroke-width="1"/>
+    <text x="82" y="861">Client tier</text>
+
+    <rect x="180" y="850" width="14" height="14" rx="3" fill="#EEEDFE" stroke="#534AB7" stroke-width="1"/>
+    <text x="202" y="861">Kiro-managed services</text>
+
+    <rect x="370" y="850" width="14" height="14" rx="3" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1"/>
+    <text x="392" y="861">Commercial regions</text>
+
+    <rect x="540" y="850" width="14" height="14" rx="3" fill="#FAEEDA" stroke="#BA7517" stroke-width="1"/>
+    <text x="562" y="861">GovCloud / external</text>
+
+    <rect x="720" y="850" width="14" height="14" rx="3" fill="#FAECE7" stroke="#993C1D" stroke-width="1"/>
+    <text x="742" y="861">AI backend</text>
+  </g>
+
+  <text x="1140" y="861" text-anchor="end" font-size="10" fill="#888780" font-family="Arial, sans-serif" font-style="italic">Based on kiro.dev firewall documentation</text>
+</svg>

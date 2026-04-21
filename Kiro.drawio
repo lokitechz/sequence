@@ -1,0 +1,34 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="IByy3bbS-SpJ2ZM2q72t">
+    <mxGraphModel dx="1006" dy="578" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="D1EiUjMzbOKjaFcmnZKX-2" edge="1" parent="1" source="JiDsNCO-VytWRXSDMC-m-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="D1EiUjMzbOKjaFcmnZKX-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="JiDsNCO-VytWRXSDMC-m-4" parent="1" style="fontColor=#0066CC;verticalAlign=top;verticalLabelPosition=bottom;labelPosition=center;align=center;html=1;outlineConnect=0;fillColor=#CCCCCC;strokeColor=#6881B3;gradientColor=none;gradientDirection=north;strokeWidth=2;shape=mxgraph.networks.pc;" value="" vertex="1">
+          <mxGeometry height="70" width="100" x="350" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="D1EiUjMzbOKjaFcmnZKX-8" edge="1" parent="1" source="D1EiUjMzbOKjaFcmnZKX-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="D1EiUjMzbOKjaFcmnZKX-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="D1EiUjMzbOKjaFcmnZKX-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;align=left;verticalAlign=top;fontSize=15;" value="Operating System" vertex="1">
+          <mxGeometry height="180" width="560" x="120" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="D1EiUjMzbOKjaFcmnZKX-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" value="Windows" vertex="1">
+          <mxGeometry height="60" width="120" x="160" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="D1EiUjMzbOKjaFcmnZKX-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" value="MacOS" vertex="1">
+          <mxGeometry height="60" width="120" x="340" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="D1EiUjMzbOKjaFcmnZKX-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;" value="Linux" vertex="1">
+          <mxGeometry height="60" width="120" x="520" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="D1EiUjMzbOKjaFcmnZKX-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;dashed=1;align=left;verticalAlign=top;fontSize=15;" value="Operating System" vertex="1">
+          <mxGeometry height="180" width="560" x="120" y="520" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

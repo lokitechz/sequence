@@ -1,0 +1,44 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="85ujB5oYQflCBoA7UPu9">
+    <mxGraphModel dx="1006" dy="578" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-2" edge="1" parent="1" source="QMPkTNgHG6Wg9gsR3G9R-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="QMPkTNgHG6Wg9gsR3G9R-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="380" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Modem Viettel" vertex="1">
+          <mxGeometry height="60" width="120" x="320" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-5" edge="1" parent="1" source="QMPkTNgHG6Wg9gsR3G9R-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" target="QMPkTNgHG6Wg9gsR3G9R-4" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Switch mạng" vertex="1">
+          <mxGeometry height="60" width="120" x="320" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Modem TP-Link Archer BE230" vertex="1">
+          <mxGeometry height="60" width="120" x="320" y="560" as="geometry" />
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-7" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Mạng ở Modem TP Link có hoạt động" vertex="1">
+          <mxGeometry height="30" width="215" x="272.5" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-8" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Mạng ở Modem TP Link không hoạt động" vertex="1">
+          <mxGeometry height="30" width="240" x="530" y="260" as="geometry" />
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-9" edge="1" parent="1" source="QMPkTNgHG6Wg9gsR3G9R-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="QMPkTNgHG6Wg9gsR3G9R-13">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="650" y="440" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Modem Viettel" vertex="1">
+          <mxGeometry height="60" width="120" x="590" y="320" as="geometry" />
+        </mxCell>
+        <mxCell id="QMPkTNgHG6Wg9gsR3G9R-13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Modem TP-Link Archer BE230" vertex="1">
+          <mxGeometry height="60" width="120" x="590" y="440" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
