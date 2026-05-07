@@ -1,0 +1,29 @@
+No,Source,Destination,Port,Note,Connection Status
+1,Kiro CLI,app.kiro.dev,443,Sign-in portal,Required
+2,Kiro CLI,assets.app.kiro.dev,443,Application assets,Required
+3,Kiro CLI,cli.kiro.dev,443,CLI application,Required
+4,Kiro CLI,prod.us-east-1.auth.desktop.kiro.dev,443,Token exchange/refresh/logout,Required
+5,Kiro CLI,prod.us-east-1.telemetry.desktop.kiro.dev,443,Telemetry,Required
+6,Kiro CLI,prod.download.desktop.kiro.dev,443,Auto-updates and Powers registry,Required
+7,Kiro CLI,prod.download.cli.kiro.dev,443,CLI downloads and updates,Required
+8,Kiro CLI,desktop-release.q.us-east-1.amazonaws.com,443,CLI installer downloads,Required
+9,Kiro CLI,q.us-east-1.amazonaws.com,443,Kiro service (US East) - Legacy,Required (Deprecated)
+10,Kiro CLI,q.eu-central-1.amazonaws.com,443,Kiro service (Europe) - Legacy,Required (Deprecated)
+11,Kiro CLI,runtime.us-east-1.kiro.dev,443,Kiro service (US East),Required
+12,Kiro CLI,runtime.eu-central-1.kiro.dev,443,Kiro service (Europe),Required
+13,Kiro CLI,management.us-east-1.kiro.dev,443,Configuration & access management (US East),Required
+14,Kiro CLI,management.eu-central-1.kiro.dev,443,Configuration & access management (Europe),Required
+15,Kiro CLI,telemetry.us-east-1.kiro.dev,443,Telemetry (US East),Required
+16,Kiro CLI,telemetry.eu-central-1.kiro.dev,443,Telemetry (Europe),Required
+17,Kiro Browser,cognito-identity.us-east-1.amazonaws.com,443,Federated identity for social sign-in (Google/GitHub),Required (if using social login)
+18,Kiro Browser,login.microsoftonline.com,443,Microsoft Entra ID authentication,Required (if using Entra ID)
+19,Kiro Browser,<your-org>.okta.com,443,Okta authentication,Required (if using Okta)
+20,Kiro Browser,<region>.signin.aws,443,AWS sign-in,Required (if using IAM Identity Center)
+21,Kiro Browser,<idc-directory-id>.awsapps.com,443,IAM Identity Center portal,Required (if using IAM Identity Center)
+22,Kiro Browser,oidc.<sso-region>.amazonaws.com,443,OIDC token exchange,Required (if using IAM Identity Center)
+23,Kiro Browser,billing.stripe.com,443,Billing portal for paid plans,Required (if using Stripe)
+24,Kiro Browser,checkout.stripe.com,443,Checkout for plan upgrades,Required (if using Stripe)
+25,Kiro CLI,q-fips.us-gov-east-1.amazonaws.com,443,Kiro service (AWS GovCloud US-East),Required (if using GovCloud)
+26,Kiro CLI,q-fips.us-gov-west-1.amazonaws.com,443,Kiro service (AWS GovCloud US-West),Required (if using GovCloud)
+27,Kiro CLI,github.com,443,Repository cloning (MCP feature),Optional
+28,Kiro CLI,raw.githubusercontent.com,443,Config files & readme images (MCP feature),Optional
